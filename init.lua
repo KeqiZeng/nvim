@@ -196,6 +196,11 @@ require('packer').startup(function()
 }
   -- Registers
   use "tversteeg/registers.nvim"
+  -- Code_runner
+  use { 'CRAG666/code_runner.nvim',
+		requires = 'nvim-lua/plenary.nvim',
+		ft = {"c", "cpp", "go", "py", "sh"}
+}
 
   -- LSP
   use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
@@ -203,6 +208,7 @@ require('packer').startup(function()
   use 'ray-x/lsp_signature.nvim'
   use 'tami5/lspsaga.nvim'
   use 'kosayoda/nvim-lightbulb'
+
   -- Cmp
   use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
   use 'hrsh7th/cmp-nvim-lsp' -- LSP source for nvim-cmp
@@ -213,6 +219,13 @@ require('packer').startup(function()
   use 'hrsh7th/cmp-path'
   use 'hrsh7th/cmp-nvim-lua'
   use 'uga-rosa/cmp-dictionary'
+
+  -- Language
+  use {
+		'iamcco/markdown-preview.nvim',
+		ft = "markdown",
+		run = "cd app && yarn install"
+	}
 end)
 
 
@@ -858,6 +871,18 @@ map("n", "<C-g>", [[<cmd>LazyGit<CR>]], opt)
 
 
 --
+-- #code_runner
+--
+require('code_runner').setup {
+  term = {
+    position = "belowright",
+    size = 8
+  },
+  filetype_path = "$HOME/.config/nvim/code_runner.json",
+  project_path = "$HOME/.config/nvim/projects.json"
+}
+
+
 
 --
 -- #lspconfig
@@ -891,7 +916,7 @@ capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { 'bashls', 'clangd', 'cmake', 'dockerls', 'gopls', 'html', 'jsonls', 'sumneko_lua', 'pyright', 'texlab' }
+local servers = { 'bashls', 'clangd', 'cmake', 'dockerls', 'gopls', 'html', 'jsonls', 'sumneko_lua', 'pyright', 'remark_ls','texlab' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = on_attach,
@@ -1090,3 +1115,9 @@ map( "n", "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", opt)
 map( "n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opt)
 map( "n", "<C-u>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>", opt)
 map( "n", "<C-d>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>", opt)
+
+
+--
+-- #mkdp
+--
+map("n", "<LEADER><CR>", [[<cmd>MarkdownPreview<CR>]], opt)
