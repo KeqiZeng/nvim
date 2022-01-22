@@ -1,3 +1,10 @@
+-- skip check python_host to speedup
+vim.g.python_host_skip_check=1
+vim.g.python_host_prog = '/usr/bin/python2'
+vim.g.python3_host_skip_check=1
+vim.g.python3_host_prog = '/Users/ketch/miniforge3/bin/python3'
+
+
 --
 -- #basic/options
 --
@@ -153,7 +160,7 @@ require('packer').startup(function()
   -- Cursorword
   use 'yamatsum/nvim-cursorline'
   -- Tidy
-  use 'McAuleyPenney/tidy.nvim'
+  use{ "McAuleyPenney/tidy.nvim", event = "BufWritePre" }
   -- Indentline
   use 'lukas-reineke/indent-blankline.nvim'
   -- Treesitter
