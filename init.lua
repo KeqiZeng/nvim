@@ -116,13 +116,11 @@ require('packer').startup(function()
   use 'goolord/alpha-nvim'
   -- Colorscheme
   use 'olimorris/onedarkpro.nvim'
-
   -- nvim-gps
   use {
 	'SmiteshP/nvim-gps',
 	requires = 'nvim-treesitter/nvim-treesitter'
 }
-
   -- LuaLine
   use {
     'nvim-lualine/lualine.nvim',
@@ -142,6 +140,11 @@ require('packer').startup(function()
 }
   -- Comment
   use 'numToStr/Comment.nvim'
+  -- Todo_comments
+  use {
+  "folke/todo-comments.nvim",
+  requires = "nvim-lua/plenary.nvim",
+}
   -- Hop
   use {
     'phaazon/hop.nvim',
@@ -158,6 +161,7 @@ require('packer').startup(function()
     'nvim-treesitter/nvim-treesitter',
     run = ':TSUpdate'
 }
+  use 'nvim-treesitter/nvim-treesitter-textobjects'
   -- Autopairs
   use {
     'windwp/nvim-autopairs',
@@ -176,20 +180,22 @@ require('packer').startup(function()
     }
   end
 }
-  -- gitsigns
+  -- Gitsigns
   use {
   'lewis6991/gitsigns.nvim',
   requires = 'nvim-lua/plenary.nvim'
 }
-  -- colorizer
+  -- Lazygit
+  use 'kdheepak/lazygit.nvim'
+  -- Colorizer
   use {
   'norcalli/nvim-colorizer.lua',
   config = function()
 	require'colorizer'.setup()
   end
 }
-  -- lazygit
-  use 'kdheepak/lazygit.nvim'
+  -- Registers
+  use "tversteeg/registers.nvim"
 
   -- LSP
   use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
@@ -381,6 +387,7 @@ onedarkpro.setup({
           green = "#98c378",
 		  blue = "#86a6e8",
 	      purple = "#bb88e5",
+		  cyan = "#66bbd0",
 		  pink = "#ff9999",
       },
   }, -- Override default colors. Can specify colors for "onelight" or "onedark" themes by passing in a table
@@ -388,7 +395,6 @@ onedarkpro.setup({
       Operator = { fg = "${blue}" },
       Identifier = { link = "Operator" },
       Constant = { link = "Operator" },
-      Todo = {fg = "${blue}", style = "bold,italic"},
 	  TSVariable = {fg = "${pink}" },
   }, -- Override default highlight groups
   plugins = { -- Override which plugins highlight groups are loaded
@@ -490,9 +496,9 @@ require('bufferline').setup {
       return "("..count..")"
     end,
     -- NOTE: this will be called a lot so don't do any heavy processing here
-    custom_filter = function(buf_number, buf_numbers)
+    custom_filter = function(buf_number)
       -- filter out by buffer name
-      if vim.fn.bufname(buf_number) ~= "alpha" then
+      if vim.fn.bufname(buf_number) ~= "alpha" or "NvimTree" then
         return true
       end
     end,
@@ -580,6 +586,17 @@ require('Comment').setup {
     },
 }
 
+--
+-- #todo_comments
+--
+require("todo-comments").setup {
+	keywords = {
+		TODO = { icon = " ", color = "info" },
+		PERF = { icon = " ", color = "#bb88e5", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } }
+	}
+}
+map("n", "<LEADER>ft", [[<cmd>TodoTelescope<CR>]], opt)
+
 
 --
 -- #hop
@@ -591,11 +608,12 @@ map('n', 'f', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.
 map('n', 'F', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<CR>", {})
 
 
+
 --
 -- #indentline
 --
 require("indent_blankline").setup({
-    filetype_exclude = {"lspinfo", "packer", "checkhealth", "help", "alpha", "NvimTree", ""},
+    filetype_exclude = {"lspinfo", "packer", "checkhealth", "help", "alpha", "NvimTree"},
     buftype_exclude = { "terminal" },
 })
 
@@ -621,6 +639,29 @@ require'nvim-treesitter.configs'.setup {
     -- Using this option may slow down your editor, and you may see some duplcate highlights.
     -- Instead of true it can also be a list of languages
     additional_vim_regex_highlighting = false,
+  },
+  textobjects = {
+    select = {
+        enable = true,
+        keymaps = {
+            ["af"] = "@function.outer",
+            ["if"] = "@function.inner",
+            ["ac"] = "@class.outer",
+            ["ic"] = "@class.inner"
+        }
+    },
+    move = {
+        enable = true,
+        set_jumps = true, -- whether to set jumps in the jumplist
+        goto_next_start = {
+            ["]f"] = "@function.outer",
+            ["]c"] = "@class.outer"
+        },
+        goto_previous_start = {
+            ["[f"] = "@function.outer",
+            ["[c"] = "@class.outer"
+        },
+    }
   },
   rainbow = {
     enable = true,
@@ -719,8 +760,8 @@ require'nvim-tree'.setup {
       { key = "y",                            action = "copy_name" },
       { key = "gy",                           action = "copy_path" },
       { key = "Y",                            action = "copy_absolute_path" },
-      { key = "[c",                           action = "prev_git_item" },
-      { key = "]c",                           action = "next_git_item" },
+      { key = "[g",                           action = "prev_git_item" },
+      { key = "]g",                           action = "next_git_item" },
       { key = "-",                            action = "dir_up" },
       { key = "q",                            action = "close" },
       { key = "?",                            action = "toggle_help" },
@@ -757,8 +798,8 @@ require('gitsigns').setup {
     -- Default keymap options
     noremap = true,
 
-    ['n ]c'] = { expr = true, "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'"},
-    ['n [c'] = { expr = true, "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'"},
+    ['n ]g'] = { expr = true, "&diff ? ']g' : '<cmd>Gitsigns next_hunk<CR>'"},
+    ['n [g'] = { expr = true, "&diff ? '[g' : '<cmd>Gitsigns prev_hunk<CR>'"},
 
     ['n <leader>hs'] = '<cmd>Gitsigns stage_hunk<CR>',
     ['v <leader>hs'] = ':Gitsigns stage_hunk<CR>',
@@ -812,28 +853,37 @@ require('gitsigns').setup {
 -- #lazygit
 --
 vim.g.lazygit_floating_window_use_plenary = 1,
-map("n", "<LEADER>gg", [[<cmd>LazyGit<CR>]], opt)
+---@diagnostic disable-next-line: redundant-value
+map("n", "<C-g>", [[<cmd>LazyGit<CR>]], opt)
 
+
+--
 
 --
 -- #lspconfig
 --
 local lspconfig = require('lspconfig')
 local on_attach = function(_, bufnr)
-  map("n", "gD", [[<cmd>lua vim.lsp.buf.declaration()<CR>]], opt)
-  map("n", "gd", [[<cmd>lua vim.lsp.buf.definition()<CR>]], opt)
-  map("n", "gt", [[<cmd>lua vim.lsp.buf.type_definition()<CR>]], opt)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  map("n", "<LEADER>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>]], opt)
-  map("n", "<LEADER>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>]], opt)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<LEADER>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<LEADER>a', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", [[<cmd>lua vim.lsp.buf.definition()<cr>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", [[<cmd>lua vim.lsp.buf.declaration()<cr>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", [[<cmd>lua vim.lsp.buf.type_definition()<cr>]], opt)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'k', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<c-k>', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<cr>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>]], opt)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()']]
+  vim.cmd([[
+            augroup LspFormatting
+                autocmd! * <buffer>
+                autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+            augroup END
+            ]])
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -841,7 +891,7 @@ capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { 'bashls', 'clangd', 'cmake', 'gopls', 'html', 'jsonls', 'pyright', 'texlab' }
+local servers = { 'bashls', 'clangd', 'cmake', 'dockerls', 'gopls', 'html', 'jsonls', 'sumneko_lua', 'pyright', 'texlab' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = on_attach,
@@ -849,17 +899,6 @@ for _, lsp in ipairs(servers) do
     single_file_support = true
   }
 end
-
--- lua
-local runtime_path = vim.split(package.path, ';')
-table.insert(runtime_path, "lua/?.lua")
-table.insert(runtime_path, "lua/?/init.lua")
-
-require'lspconfig'.sumneko_lua.setup {
-  cmd = { "/usr//local/lua-language-server/bin/lua-language-server" },
-    on_attach = on_attach,
-    capabilities = capabilities,
-}
 
 
 --
@@ -901,10 +940,7 @@ cmp.setup {
     { name = 'path', priority = 10 },
     { name = 'dictionary', keyword_length = 2, priority = 1 },
   },
-
   mapping = {
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-n>'] = cmp.mapping.select_next_item(),
     ['<C-d>'] = cmp.mapping.scroll_docs(4),
     ['<C-u>'] = cmp.mapping.scroll_docs(-4),
     ['<C-c>'] = cmp.mapping.complete(),
@@ -1015,20 +1051,20 @@ lspsaga.setup { -- defaults ...
   code_action_prompt = {
     enable = true,
     sign = true,
-    sign_priority = 40,
+    sign_priority = 36,
     virtual_text = true,
   },
-  finder_definition_icon = "  ",
-  finder_reference_icon = "  ",
-  max_preview_lines = 10,
-  finder_action_keys = {
-    open = "o",
-    vsplit = "v",
-    split = "x",
-    quit = "q",
-    scroll_down = "<C-j>",
-    scroll_up = "<C-k>",
-  },
+  -- finder_definition_icon = "  ",
+  -- finder_reference_icon = "  ",
+  -- max_preview_lines = 10,
+  -- finder_action_keys = {
+  --   open = "o",
+  --   vsplit = "v",
+  --   split = "x",
+  --   quit = "q",
+  --   scroll_down = "<C-j>",
+  --   scroll_up = "<C-k>",
+  -- },
   code_action_keys = {
     quit = "<C-e>",
     exec = "<CR>",
@@ -1045,8 +1081,7 @@ lspsaga.setup { -- defaults ...
 }
 
 --- In lsp attach function
--- map( "n", "gp", "<cmd>Lspsaga preview_definition<CR>", opt)
-map( "n", "gp", "<cmd>Lspsaga lsp_finder<CR>", opt)
+map( "n", "gp", "<cmd>Lspsaga preview_definition<CR>", opt)
 map( "n", "<LEADER>rn", "<cmd>Lspsaga rename<CR>", opt)
 map( "n", "<LEADER>a", "<cmd>Lspsaga code_action<CR>", opt)
 map( "x", "<LEADER>a", ":<c-u>Lspsaga range_code_action<CR>", opt)

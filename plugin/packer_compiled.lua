@@ -210,6 +210,11 @@ _G.packer_plugins = {
     path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/nvim-treesitter",
     url = "https://github.com/nvim-treesitter/nvim-treesitter"
   },
+  ["nvim-treesitter-textobjects"] = {
+    loaded = true,
+    path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/nvim-treesitter-textobjects",
+    url = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
+  },
   ["nvim-ts-autotag"] = {
     loaded = true,
     path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/nvim-ts-autotag",
@@ -240,6 +245,11 @@ _G.packer_plugins = {
     path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
   },
+  ["registers.nvim"] = {
+    loaded = true,
+    path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/registers.nvim",
+    url = "https://github.com/tversteeg/registers.nvim"
+  },
   ["surround.nvim"] = {
     config = { "\27LJ\2\nf\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\3\0B\0\2\1K\0\1\0\1\0\2\20map_insert_mode\1\19mappings_style\rsandwich\nsetup\rsurround\frequire\0" },
     loaded = true,
@@ -255,6 +265,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/tidy.nvim",
     url = "https://github.com/McAuleyPenney/tidy.nvim"
+  },
+  ["todo-comments.nvim"] = {
+    loaded = true,
+    path = "/Users/ketch/.local/share/nvim/site/pack/packer/start/todo-comments.nvim",
+    url = "https://github.com/folke/todo-comments.nvim"
   }
 }
 
