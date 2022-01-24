@@ -1,4 +1,4 @@
-# Kecht's personal Nvimconf
+# Ketch's personal Nvimconf
 
 Tired to open many files when change my config, so written all config in init.lua
 

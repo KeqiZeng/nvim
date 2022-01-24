@@ -169,6 +169,13 @@ require('packer').startup(function()
     run = ':TSUpdate'
 }
   use 'nvim-treesitter/nvim-treesitter-textobjects'
+  -- Spellsitter
+  use {
+  'lewis6991/spellsitter.nvim',
+  config = function()
+    require('spellsitter').setup()
+  end
+}
   -- Autopairs
   use {
     'windwp/nvim-autopairs',
@@ -203,11 +210,8 @@ require('packer').startup(function()
 }
   -- Registers
   use "tversteeg/registers.nvim"
-  -- Code_runner
-  use { 'CRAG666/code_runner.nvim',
-		requires = 'nvim-lua/plenary.nvim',
-		ft = {"c", "cpp", "go", "py", "sh"}
-}
+  -- Hlslens
+  use 'kevinhwang91/nvim-hlslens'
 
   -- LSP
   use 'neovim/nvim-lspconfig' -- Collection of configurations for built-in LSP client
@@ -228,11 +232,17 @@ require('packer').startup(function()
   use 'uga-rosa/cmp-dictionary'
 
   -- Language
+  -- markdown
   use {
 		'iamcco/markdown-preview.nvim',
 		ft = "markdown",
 		run = "cd app && yarn install"
 	}
+  -- Code_runner
+  use { 'CRAG666/code_runner.nvim',
+		requires = 'nvim-lua/plenary.nvim'
+}
+
 end)
 
 
@@ -466,7 +476,7 @@ vim.cmd([[autocmd User TelescopePreviewerLoaded setlocal wrap]])
 
 map("n", "<LEADER>F", [[<cmd>Telescope<CR>]], opt)
 map("n", "<LEADER>ff", [[<cmd>lua require('telescope.builtin').find_files() hidden=true<CR>]], opt)
-map("n", "<LEADER>fo", [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]], opt)
+map("n", "<LEADER>fr", [[<cmd>lua require('telescope.builtin').oldfiles()<CR>]], opt)
 map("n", "<LEADER>fc", [[<cmd>lua require('telescope.builtin').command_history()<CR>]], opt)
 map("n", "<LEADER>fd", [[<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>]], opt)
 map("n", "<LEADER>fD", [[<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<CR>]], opt)
@@ -476,8 +486,8 @@ map("n", "<LEADER>fg", [[<cmd>lua require('telescope.builtin').live_grep()<CR>]]
 map("n", "<LEADER>fb", [[<cmd>lua require('telescope.builtin').buffers()<CR>]], opt)
 map("n", "<LEADER>fm", [[<cmd>lua require('telescope.builtin').marks()<CR>]], opt)
 map("n", "<C-f>", [[<cmd>lua require('telescope.builtin').treesitter()<CR>]], opt)
-map("n", "gr", [[<cmd>lua require('telescope.builtin').lsp_references()<CR>]], opt)
-map("n", "gi", [[<cmd>lua require('telescope.builtin').lsp_implementations()<CR>]], opt)
+-- map("n", "gr", [[<cmd>lua require('telescope.builtin').lsp_references()<CR>]], opt)
+-- map("n", "gi", [[<cmd>lua require('telescope.builtin').lsp_implementations()<CR>]], opt)
 
 
 --
@@ -878,17 +888,10 @@ map("n", "<C-g>", [[<cmd>LazyGit<CR>]], opt)
 
 
 --
--- #code_runner
+-- #hlslens
 --
-require('code_runner').setup {
-  term = {
-    position = "belowright",
-    size = 8
-  },
-  filetype_path = "$HOME/.config/nvim/code_runner.json",
-  project_path = "$HOME/.config/nvim/projects.json"
-}
-
+map("n", "*", [[*<cmd>lua require('hlslens').start()<CR>]], opt)
+map("n", "#", [[#<cmd>lua require('hlslens').start()<CR>]], opt)
 
 
 --
@@ -896,19 +899,20 @@ require('code_runner').setup {
 --
 local lspconfig = require('lspconfig')
 local on_attach = function(_, bufnr)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", [[<cmd>lua vim.lsp.buf.definition()<cr>]], opt)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", [[<cmd>lua vim.lsp.buf.declaration()<cr>]], opt)
-  vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", [[<cmd>lua vim.lsp.buf.type_definition()<cr>]], opt)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', 'k', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<c-k>', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", [[<cmd>lua vim.lsp.buf.definition()<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", [[<cmd>lua vim.lsp.buf.declaration()<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", [[<cmd>lua vim.lsp.buf.type_definition()<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", [[<cmd>lua require('telescope.builtin').lsp_references()<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", [[<cmd>lua require('telescope.builtin').lsp_implementations()<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "gp", [[<cmd>Lspsaga preview_definition<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>rn", [[<cmd>Lspsaga rename<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>a", [[<cmd>Lspsaga code_action<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "x", "<LEADER>a", [[:<c-u>Lspsaga range_code_action<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "K", [[<cmd>Lspsaga hover_doc<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", [[<cmd>Lspsaga diagnostic_jump_next<CR>]], opt)
+  vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", [[<cmd>Lspsaga diagnostic_jump_prev<CR>]], opt)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<cr>]], opt)
   vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>]], opt)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>a', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
   vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()']]
   vim.cmd([[
             augroup LspFormatting
@@ -1113,18 +1117,34 @@ lspsaga.setup { -- defaults ...
 }
 
 --- In lsp attach function
-map( "n", "gp", "<cmd>Lspsaga preview_definition<CR>", opt)
-map( "n", "<LEADER>rn", "<cmd>Lspsaga rename<CR>", opt)
-map( "n", "<LEADER>a", "<cmd>Lspsaga code_action<CR>", opt)
-map( "x", "<LEADER>a", ":<c-u>Lspsaga range_code_action<CR>", opt)
-map( "n", "K",  "<cmd>Lspsaga hover_doc<CR>", opt)
-map( "n", "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", opt)
-map( "n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opt)
-map( "n", "<C-u>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>", opt)
-map( "n", "<C-d>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>", opt)
+-- map( "n", "gp", "<cmd>Lspsaga preview_definition<CR>", opt)
+-- map( "n", "<LEADER>rn", "<cmd>Lspsaga rename<CR>", opt)
+-- map( "n", "<LEADER>a", "<cmd>Lspsaga code_action<CR>", opt)
+-- map( "x", "<LEADER>a", ":<c-u>Lspsaga range_code_action<CR>", opt)
+-- map( "n", "K",  "<cmd>Lspsaga hover_doc<CR>", opt)
+-- map( "n", "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", opt)
+-- map( "n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opt)
+map( "n", "<C-u>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>]], opt)
+map( "n", "<C-d>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>]], opt)
 
 
 --
 -- #mkdp
 --
-map("n", "<LEADER><CR>", [[<cmd>MarkdownPreview<CR>]], opt)
+map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
+
+
+
+
+--
+-- #code_runner
+--
+require('code_runner').setup {
+  term = {
+    position = "belowright",
+    size = 15
+  },
+  filetype_path = vim.fn.expand('~/.config/nvim/code_runner.json'),
+  project_path = vim.fn.expand('~/.config/nvim/projects_manager.json'),
+}
+map("n", "<LEADER><CR>", [[<cmd>RunCode<CR>]], {noremap = true, silent = false})

@@ -1,0 +1,7 @@
+{
+	"~/Workspace/python/intel_2021_1": {
+		"name": "Intel Course 2021",
+		"description": "an example for code_runner.nvim",
+		"file_name": "POO/main.py"
+	}
+}

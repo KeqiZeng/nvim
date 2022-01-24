@@ -1,7 +1,7 @@
 {
-	"shellscript": "bash",
-	"c": "cd $dir && clang $filename -Wall -o $fileNameWithoutExt && ./$fileNameWithoutExt",
+	"sh": "bash",
+	"c": "cd $dir && clang $fileName -Wall -o $fileNameWithoutExt && ./$fileNameWithoutExt",
 	"cpp": "cd $dir && clang++ -std=c++20 $fileName -Wall -o $fileNameWithoutExt && ./$fileNameWithoutExt",
 	"go": "go run",
-	"python": "python -u"
+	"python": "python"
 }
