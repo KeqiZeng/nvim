@@ -138,6 +138,7 @@ require('packer').startup(function()
     'nvim-telescope/telescope.nvim',
     requires = { 'nvim-lua/plenary.nvim' }
 }
+  use {'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   -- Bufferline
   use {'akinsho/bufferline.nvim', requires = 'kyazdani42/nvim-web-devicons'}
   -- Nvim-tree
@@ -468,9 +469,19 @@ require("telescope").setup {
         ["<C-j>"] = require("telescope.actions").move_selection_next,
         ["<C-k>"] = require("telescope.actions").move_selection_previous
       }
+    },
+	extensions = {
+    fzf = {
+      fuzzy = true,                    -- false will only do exact matching
+      override_generic_sorter = true,  -- override the generic sorter
+      override_file_sorter = true,     -- override the file sorter
+      case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+      }
     }
   }
 }
+
+require('telescope').load_extension('fzf')
 
 vim.cmd([[autocmd User TelescopePreviewerLoaded setlocal wrap]])
 
@@ -1134,8 +1145,6 @@ map( "n", "<C-d>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1
 map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
 
 
-
-
 --
 -- #code_runner
 --
@@ -1147,4 +1156,12 @@ require('code_runner').setup {
   filetype_path = vim.fn.expand('~/.config/nvim/code_runner.json'),
   project_path = vim.fn.expand('~/.config/nvim/projects_manager.json'),
 }
-map("n", "<LEADER><CR>", [[<cmd>RunCode<CR>]], {noremap = true, silent = false})
+function SaveAndRunCode()
+	vim.api.nvim_exec(
+		[[
+			w
+			RunCode
+		]],
+	false)
+end
+map("n", "<LEADER><CR>", [[<cmd>lua SaveAndRunCode()<CR>]], {noremap = true, silent = false})
