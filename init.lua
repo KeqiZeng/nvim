@@ -49,12 +49,14 @@ vim.cmd("set incsearch")
 vim.cmd("set encoding=utf-8")
 vim.cmd("set fileencoding=utf-8")
 
+-- 其他
 vim.cmd("set showmatch")
 vim.cmd("set matchtime=2")
 vim.cmd("set formatoptions+=m")
 vim.cmd("set formatoptions+=B")
 vim.cmd("set hidden")
 vim.cmd("set updatetime=100")
+vim.cmd("set cmdheight=1")
 
 vim.cmd("let $NVIM_TUI_ENABLE_TRUE_COLOR=1")
 vim.cmd("set termguicolors")
@@ -219,7 +221,6 @@ require('packer').startup(function()
   use 'onsails/lspkind-nvim'
   use 'ray-x/lsp_signature.nvim'
   use 'tami5/lspsaga.nvim'
-  use 'kosayoda/nvim-lightbulb'
 
   -- Cmp
   use 'hrsh7th/nvim-cmp' -- Autocompletion plugin
@@ -413,12 +414,12 @@ onedarkpro.setup({
   end,
   colors = {
       onedark = {
-          red = "#F15e64",
+          red = "#f15e64",
           orange = "#e88854",
           green = "#98c378",
 		  blue = "#86a6e8",
 	      purple = "#bb88e5",
-		  cyan = "#66bbd0",
+		  cyan = "#63d4d5",
 		  pink = "#ff9999",
       },
   }, -- Override default colors. Can specify colors for "onelight" or "onedark" themes by passing in a table
@@ -533,8 +534,8 @@ require('bufferline').setup {
     tab_size = 18,
     diagnostics = "nvim_lsp",
     diagnostics_update_in_insert = false,
-    diagnostics_indicator = function(count, level, diagnostics_dict, context)
-      return "("..count..")"
+    diagnostics_indicator = function(count, level)
+      return "("..count..") ("..level..")"
     end,
     -- NOTE: this will be called a lot so don't do any heavy processing here
     custom_filter = function(buf_number)
@@ -664,7 +665,7 @@ require("indent_blankline").setup({
 --
 require'nvim-treesitter.configs'.setup {
   -- One of "all", "maintained" (parsers with maintainers), or a list of languages
-  ensure_installed = {"c", "cpp", "cmake", "go", "gomod", "python", "bash", "lua", "latex", "bibtex", "html", "dockerfile", "json", "toml", "yaml"},
+  ensure_installed = {"c", "cpp", "cmake", "go", "gomod", "python", "bash", "fish", "lua", "latex", "bibtex", "html", "dockerfile", "json", "toml", "yaml"},
 
   -- Install languages synchronously (only applied to `ensure_installed`)
   sync_install = false,
@@ -955,12 +956,6 @@ require "lsp_signature".setup()
 
 
 --
--- #lightbulb
---
-vim.cmd [[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]]
-
-
---
 -- #cmp
 --
 local has_words_before = function()
@@ -1099,7 +1094,7 @@ lspsaga.setup { -- defaults ...
     enable = true,
     sign = true,
     sign_priority = 36,
-    virtual_text = true,
+    virtual_text = false,
   },
   -- finder_definition_icon = "  ",
   -- finder_reference_icon = "  ",
