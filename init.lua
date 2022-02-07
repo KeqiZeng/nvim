@@ -2,7 +2,7 @@
 vim.g.python_host_skip_check=1
 vim.g.python_host_prog = '/usr/bin/python2'
 vim.g.python3_host_skip_check=1
-vim.g.python3_host_prog = '/Users/ketch/miniforge3/bin/python3'
+vim.g.python3_host_prog = '/opt/homebrew/Caskroom/miniforge/base/bin/python3'
 
 
 --
@@ -414,13 +414,20 @@ onedarkpro.setup({
   end,
   colors = {
       onedark = {
+		  bg = "#2e2e2e",
+		  fg = "#e9e9e9",
           red = "#f15e64",
           orange = "#e88854",
           green = "#98c378",
+		  yellow = "#e5c07b",
 		  blue = "#86a6e8",
 	      purple = "#bb88e5",
 		  cyan = "#63d4d5",
 		  pink = "#ff9999",
+		  white = "#e9e9e9",
+		  black = "#2e2e2e",
+		  gray = "#aaaaaa",
+		  highlight = "#f5d08b"
       },
   }, -- Override default colors. Can specify colors for "onelight" or "onedark" themes by passing in a table
   hlgroups = {
@@ -428,6 +435,12 @@ onedarkpro.setup({
       Identifier = { link = "Operator" },
       Constant = { link = "Operator" },
 	  TSVariable = {fg = "${pink}" },
+	  IndentBlanklineIndent1 = { fg = "#666666" },
+	  IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
+	  IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
+	  IndentBlanklineIndent4 = { link = "IndentBlanklineIndent1" },
+	  IndentBlanklineIndent5 = { link = "IndentBlanklineIndent1" },
+	  IndentBlanklineIndent6 = { link = "IndentBlanklineIndent1" },
   }, -- Override default highlight groups
   plugins = { -- Override which plugins highlight groups are loaded
       native_lsp = true,
@@ -498,9 +511,6 @@ map("n", "<LEADER>fg", [[<cmd>lua require('telescope.builtin').live_grep()<CR>]]
 map("n", "<LEADER>fb", [[<cmd>lua require('telescope.builtin').buffers()<CR>]], opt)
 map("n", "<LEADER>fm", [[<cmd>lua require('telescope.builtin').marks()<CR>]], opt)
 map("n", "<C-f>", [[<cmd>lua require('telescope.builtin').treesitter()<CR>]], opt)
--- map("n", "gr", [[<cmd>lua require('telescope.builtin').lsp_references()<CR>]], opt)
--- map("n", "gi", [[<cmd>lua require('telescope.builtin').lsp_implementations()<CR>]], opt)
-
 
 --
 -- #bufferline
@@ -650,11 +660,23 @@ map('n', 'f', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.
 map('n', 'F', "<cmd>lua require'hop'.hint_char1({ direction = require'hop.hint'.HintDirection.BEFORE_CURSOR, current_line_only = true })<CR>", {})
 
 
+--
+-- #cursorline
+--
+vim.g.cursorline_timeout = 500
 
 --
 -- #indentline
 --
 require("indent_blankline").setup({
+	char_highlight_list = {
+        "IndentBlanklineIndent1",
+        "IndentBlanklineIndent2",
+        "IndentBlanklineIndent3",
+        "IndentBlanklineIndent4",
+        "IndentBlanklineIndent5",
+        "IndentBlanklineIndent6",
+    },
     filetype_exclude = {"lspinfo", "packer", "checkhealth", "help", "alpha", "NvimTree"},
     buftype_exclude = { "terminal" },
 })
@@ -713,7 +735,7 @@ require'nvim-treesitter.configs'.setup {
         '#bb88e5',
         '#86a6e8',
         '#e5c07b',
-        '#f15e64'
+        '#ff9999'
       }
   },
   autotag = {
@@ -853,7 +875,6 @@ require('gitsigns').setup {
     ['n <leader>hb'] = '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',
     ['n <leader>hS'] = '<cmd>Gitsigns stage_buffer<CR>',
     ['n <leader>hU'] = '<cmd>Gitsigns reset_buffer_index<CR>',
-
     -- Text objects
     ['o ih'] = ':<C-U>Gitsigns select_hunk<CR>',
     ['x ih'] = ':<C-U>Gitsigns select_hunk<CR>'
@@ -1132,6 +1153,8 @@ lspsaga.setup { -- defaults ...
 -- map( "n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opt)
 map( "n", "<C-u>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>]], opt)
 map( "n", "<C-d>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>]], opt)
+map( "n", "<C-t>", [[<cmd>Lspsaga open_floaterm<CR>]], opt)
+map( "t", "<C-t>", [[<cmd>Lspsaga close_floaterm<CR>]], opt)
 
 
 --
