@@ -926,6 +926,37 @@ map("n", "<C-g>", [[<cmd>LazyGit<CR>]], opt)
 map("n", "*", [[*<cmd>lua require('hlslens').start()<CR>]], opt)
 map("n", "#", [[#<cmd>lua require('hlslens').start()<CR>]], opt)
 
+--
+-- #autoswitchim (require im-select)
+--
+vim.g.default_im = "com.apple.keylayout.ABC"
+local function getIm()
+	local t = io.popen('im-select')
+	return t:read("*all")
+end
+
+function InsertL()
+	vim.b.im = getIm()
+	if vim.b.im == vim.g.default_im
+	then
+		return 1
+	end
+	os.execute('im-select '..vim.g.default_im)
+end
+
+function InsertE()
+ 	if vim.b.im == vim.g.default_im
+ 	then
+		return 1
+	elseif vim.b.im == nil
+	then
+		vim.b.im = vim.g.default_im
+	end
+	os.execute('im-select '..vim.b.im)
+end
+
+vim.cmd [[autocmd InsertLeave * :silent lua InsertL()]]
+vim.cmd [[autocmd InsertEnter * :silent lua InsertE()]]
 
 --
 -- #lspconfig
@@ -952,7 +983,7 @@ local on_attach = function(_, bufnr)
                 autocmd! * <buffer>
                 autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
             augroup END
-            ]])
+         ]])
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()

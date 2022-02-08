@@ -1,4 +1,4 @@
-plugin/
+plugin/packer_compiled.lua
 .DS_Store
 .luarc.json
 projects_manager.json

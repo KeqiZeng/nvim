@@ -10,19 +10,16 @@ sudo gem install neovim
 
 # Language-Server
 npm install -g bash-language-server #bash
+npm install -g dockerfile-language-server-nodejs #dockerls
+npm install -g vscode-langservers-extracted #cssls(for css), eslint(for javascript), html and json
+npm install -g remark-language-server #remarkls for markdown
+npm install remark
 
 pip install cmake-language-server #cmake
 
-npm install -g dockerfile-language-server-nodejs #dockerls
-
 go install golang.org/x/tools/gopls@latest #golang
 
-npm install -g vscode-langservers-extracted #cssls(for css), eslint(for javascript), html and json
-
 brew install lua-language-server pyright texlab #luals, pyright and texlab
-
-npm install -g remark-language-server #remarkls for markdown
-npm install remark
 
 #clangd for c/c++ update with xcode-commandline-tool
 # brew install llvm
