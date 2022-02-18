@@ -982,13 +982,6 @@ local on_attach = function(_, bufnr)
 
 	-- #formatter
 	vim.cmd([[
-        augroup LspFormatting
-            autocmd!
-            autocmd BufWritePre *.json,*.md lua vim.lsp.buf.formatting_sync()
-        augroup END
-        ]])
-
-	vim.cmd([[
         augroup CFormatting
             autocmd!
             autocmd BufWritePost *.c,*.cpp silent !clang-format -style=google -i %
@@ -1024,6 +1017,14 @@ local on_attach = function(_, bufnr)
 		]])
 
 	vim.cmd([[
+        augroup PrettierFormatting
+            autocmd!
+            autocmd BufWritePost *.js,*.ts,*.html,*.css,*.json,*.md silent !prettier --write %
+        augroup END
+        ]])
+
+
+	vim.cmd([[
         augroup LuaFormatting
             autocmd!
             autocmd BufWritePost *.lua silent stylua --config-path $HOME/.config/stylua.toml %
@@ -1041,7 +1042,9 @@ local servers = {
 	"bashls",
 	"clangd",
 	"cmake",
+	"cssls",
 	"dockerls",
+	"eslint",
 	"gopls",
 	"html",
 	"jsonls",
