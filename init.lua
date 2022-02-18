@@ -152,19 +152,13 @@ require('packer').startup(function()
     -- Comment
     use 'numToStr/Comment.nvim'
     -- Todo_comments
-    use {
-  "folke/todo-comments.nvim",
-  requires = "nvim-lua/plenary.nvim",
-    }
+    use { 'folke/todo-comments.nvim', requires = 'nvim-lua/plenary.nvim' }
     -- Hop
-    use {
-  'phaazon/hop.nvim',
-  branch = 'v1', -- optional but strongly recommended
-    }
+    use { 'phaazon/hop.nvim', branch = 'v1' }
     -- Cursorword
     use 'yamatsum/nvim-cursorline'
     -- Tidy
-    use { "McAuleyPenney/tidy.nvim", event = "BufWritePre" }
+    use { 'McAuleyPenney/tidy.nvim', event = 'BufWritePre' }
     -- Indentline
     use 'lukas-reineke/indent-blankline.nvim'
     -- Treesitter
@@ -190,7 +184,7 @@ require('packer').startup(function()
     use 'p00f/nvim-ts-rainbow'
     -- Surround
     use {
-  "blackCauldron7/surround.nvim",
+  'blackCauldron7/surround.nvim',
   config = function()
       require "surround".setup {
       mappings_style = "sandwich",
@@ -199,12 +193,9 @@ require('packer').startup(function()
   end
     }
     -- -- Accelerated-jk
-    use "xiyaowong/accelerated-jk.nvim"
+    use 'xiyaowong/accelerated-jk.nvim'
     -- Gitsigns
-    use {
-  'lewis6991/gitsigns.nvim',
-  requires = 'nvim-lua/plenary.nvim'
-    }
+    use { 'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim' }
     -- Lazygit
     use 'kdheepak/lazygit.nvim'
     -- Colorizer
@@ -238,16 +229,9 @@ require('packer').startup(function()
 
     -- Language
     -- markdown
-    use {
-  'iamcco/markdown-preview.nvim',
-  ft = "markdown",
-  run = "cd app && yarn install"
-    }
+    use { 'iamcco/markdown-preview.nvim', ft = "markdown", run = "cd app && yarn install" }
     -- Code_runner
-    use {
-  'CRAG666/code_runner.nvim',
-  requires = 'nvim-lua/plenary.nvim'
-    }
+    use { 'CRAG666/code_runner.nvim', requires = 'nvim-lua/plenary.nvim' }
 
 end)
 
@@ -1226,5 +1210,4 @@ function SaveAndRunCode()
         false)
 end
 
-map("n", "<LEADER><CR>", [[<cmd>lua SaveAndRunCode()<CR>]], { noremap = true, silent = false })
 map("n", "<LEADER><CR>", [[<cmd>lua SaveAndRunCode()<CR>]], { noremap = true, silent = false })
