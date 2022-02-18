@@ -35,5 +35,5 @@ brew install ripgrep fd
 
 # install formatter
 pip install autopep8
-brew install stylua shfmt clang-format
+brew install stylua shfmt clang-format prettier
 conda install -c conda-forge latexindent.pl
