@@ -810,8 +810,8 @@ require 'nvim-tree'.setup {
    { key = "y", action = "copy_name" },
    { key = "gy", action = "copy_path" },
    { key = "Y", action = "copy_absolute_path" },
-   { key = "[g", action = "prev_git_item" },
-   { key = "]g", action = "next_git_item" },
+   { key = "[h", action = "prev_git_item" },
+   { key = "]h", action = "next_git_item" },
    { key = "-", action = "dir_up" },
    { key = "q", action = "close" },
    { key = "?", action = "toggle_help" },
@@ -861,8 +861,8 @@ require('gitsigns').setup {
     -- Default keymap options
     noremap = true,
 
-    ['n ]g'] = { expr = true, "&diff ? ']g' : '<cmd>Gitsigns next_hunk<CR>'" },
-    ['n [g'] = { expr = true, "&diff ? '[g' : '<cmd>Gitsigns prev_hunk<CR>'" },
+    ['n ]h'] = { expr = true, "&diff ? ']h' : '<cmd>Gitsigns next_hunk<CR>'" },
+    ['n [h'] = { expr = true, "&diff ? '[h' : '<cmd>Gitsigns prev_hunk<CR>'" },
 
     ['n <leader>hs'] = '<cmd>Gitsigns stage_hunk<CR>',
     ['v <leader>hs'] = ':Gitsigns stage_hunk<CR>',
@@ -1139,10 +1139,10 @@ lspsaga.setup { -- defaults ...
                 -- code action title icon
                 code_action_icon = " ",
                 code_action_prompt = {
-    enable = true,
-    sign = true,
-    sign_priority = 36,
-    virtual_text = false,
+  enable = true,
+  sign = true,
+  sign_priority = 36,
+  virtual_text = false,
                 },
                 -- finder_definition_icon = "  ",
                 -- finder_reference_icon = "  ",
@@ -1156,12 +1156,12 @@ lspsaga.setup { -- defaults ...
                 --   scroll_up = "<C-k>",
                 -- },
                 code_action_keys = {
-    quit = "<C-e>",
-    exec = "<CR>",
+  quit = "<C-e>",
+  exec = "<CR>",
                 },
                 rename_action_keys = {
-    quit = "<C-e>",
-    exec = "<CR>",
+  quit = "<C-e>",
+  exec = "<CR>",
                 },
                 definition_preview_icon = "  ",
                 border_style = "single",
