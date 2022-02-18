@@ -9,10 +9,10 @@ npm install -g neovim
 sudo gem install neovim
 
 # Language-Server
-npm install -g bash-language-server #bash
+npm install -g bash-language-server              #bash
 npm install -g dockerfile-language-server-nodejs #dockerls
-npm install -g vscode-langservers-extracted #cssls(for css), eslint(for javascript), html and json
-npm install -g remark-language-server #remarkls for markdown
+npm install -g vscode-langservers-extracted      #cssls(for css), eslint(for javascript), html and json
+npm install -g remark-language-server            #remarkls for markdown
 npm install remark
 
 pip install cmake-language-server #cmake
@@ -32,3 +32,8 @@ brew install tree-sitter
 
 # for Telescope
 brew install ripgrep fd
+
+# install formatter
+pip install autopep8
+brew install stylua shfmt clang-format
+conda install -c conda-forge latexindent.pl
