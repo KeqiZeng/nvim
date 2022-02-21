@@ -231,6 +231,8 @@ require("packer").startup(function()
 	-- Language
 	-- markdown
 	use({ "iamcco/markdown-preview.nvim", ft = "markdown", run = "cd app && yarn install" })
+	-- latex
+	-- use({ "lervag/vimtex", ft = "tex" })
 	-- Code_runner
 	use({ "CRAG666/code_runner.nvim", requires = "nvim-lua/plenary.nvim" })
 end)
@@ -977,8 +979,11 @@ local on_attach = function(_, bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", [[<cmd>Lspsaga hover_doc<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", [[<cmd>Lspsaga diagnostic_jump_next<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", [[<cmd>Lspsaga diagnostic_jump_prev<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<cr>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>ll", [[<cmd>TexlabBuild<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>lv", [[<cmd>TexlabForward<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>lc", [[<cmd>silent !latexmk -c %<CR><cmd>echo "latexmk: clean up!"<CR>]], opt)
 
 	-- #formatter
 	vim.cmd([[
@@ -1012,7 +1017,7 @@ local on_attach = function(_, bufnr)
 	vim.cmd([[
 		augroup LatexFormatting
 			autocmd!
-			autocmd BufWritePost *.tex silent !latexindent.pl -w %
+			autocmd BufWritePost *.tex silent !latexindent.pl -wc %
 		augroup END
 		]])
 
@@ -1023,14 +1028,12 @@ local on_attach = function(_, bufnr)
         augroup END
         ]])
 
-
 	vim.cmd([[
         augroup LuaFormatting
             autocmd!
-            autocmd BufWritePost *.lua silent stylua --config-path $HOME/.config/stylua.toml %
+            autocmd BufWritePost *.lua silent !stylua --config-path $HOME/.config/stylua.toml %
         augroup END
         ]])
-
 end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -1051,7 +1054,7 @@ local servers = {
 	"sumneko_lua",
 	"pyright",
 	"remark_ls",
-	"texlab",
+	-- "texlab",
 }
 for _, lsp in ipairs(servers) do
 	lspconfig[lsp].setup({
@@ -1060,6 +1063,50 @@ for _, lsp in ipairs(servers) do
 		single_file_support = true,
 	})
 end
+
+require("lspconfig").texlab.setup({
+	on_attach = on_attach,
+	capabilities = capabilities,
+	settings = {
+		texlab = {
+			auxDirectory = ".",
+			bibtexFormatter = "texlab",
+			build = {
+				args = {
+					"-pdf",
+					"-xelatex",
+					"-file-line-error",
+					"-halt-on-error",
+					"-interaction=nonstopmode",
+					"-synctex=1",
+					"%f",
+				},
+				executable = "latexmk",
+				forwardSearchAfter = true,
+				onSave = true,
+			},
+			chktex = {
+				onEdit = false,
+				onOpenAndSave = true,
+			},
+			diagnosticsDelay = 300,
+			formatterLineLength = 120,
+			forwardSearch = {
+				executable = "/Applications/Skim.app/Contents/SharedSupport/displayline",
+				args = { "%l", "%p", "%f" },
+				-- executable = "zathura",
+				-- args = { "--synctex-forward", "%l:1:%f", "%p" },
+				onSave = false,
+			},
+			lint = { onChange = true },
+			latexFormatter = "latexindent",
+			latexindent = {
+				modifyLineBreaks = false,
+			},
+		},
+	},
+	single_file_support = true,
+})
 
 --
 -- #lsp_signature
@@ -1246,6 +1293,15 @@ map("t", "<C-t>", [[<cmd>Lspsaga close_floaterm<CR>]], opt)
 -- #mkdp
 --
 map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
+
+--
+-- #tex
+--
+-- vim.g.tex_flavor = "latex"
+-- -- vim.g.vimtex_view_method = '/Applications/Skim.app/Contents/MacOS/Skim'
+-- vim.g.vimtex_view_method = "skim"
+-- vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
+-- vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
 
 --
 -- #code_runner
