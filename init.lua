@@ -1017,7 +1017,7 @@ local on_attach = function(_, bufnr)
 	vim.cmd([[
 		augroup LatexFormatting
 			autocmd!
-			autocmd BufWritePost *.tex silent !latexindent.pl -wc %
+			autocmd BufWritePost *.tex silent !latexindent.pl -c ~/.cache/latexindent -w %
 		augroup END
 		]])
 
