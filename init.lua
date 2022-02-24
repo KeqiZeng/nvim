@@ -421,7 +421,8 @@ onedarkpro.setup({
 		Identifier = { link = "Operator" },
 		Constant = { link = "Operator" },
 		TSVariable = { fg = "${pink}" },
-		IndentBlanklineIndent1 = { fg = "#666666" },
+		Comment = { fg = "#888888", bg = "#2e2e2e", style = "italic" },
+		IndentBlanklineIndent1 = { fg = "#3f3f3f" },
 		IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent4 = { link = "IndentBlanklineIndent1" },
@@ -436,7 +437,7 @@ onedarkpro.setup({
 	},
 	styles = {
 		strings = "NONE", -- Style that is applied to strings
-		comments = "italic", -- Style that is applied to comments
+		-- comments = "italic", -- Style that is applied to comments
 		keywords = "NONE", -- Style that is applied to keywords
 		functions = "bold", -- Style that is applied to functions
 		variables = "NONE", -- Style that is applied to variables
