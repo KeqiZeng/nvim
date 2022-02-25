@@ -7,63 +7,64 @@ vim.g.python3_host_prog = "/opt/homebrew/Caskroom/miniforge/base/bin/python3"
 --
 -- #basic/options
 --
-vim.cmd("set number")
-vim.cmd("set cursorline")
-vim.cmd("set relativenumber")
-vim.cmd("set ruler")
-vim.cmd("set clipboard=unnamedplus")
-vim.cmd("set history=500")
-vim.cmd("set nrformats=") -- 默认0##为十进制数
-vim.cmd("set timeout")
-vim.cmd("set ttimeout")
-vim.cmd("set ttimeoutlen=50")
-vim.cmd("syntax on")
-vim.cmd("set ff=unix")
+vim.cmd([[
+	set number
+	set cursorline
+	set relativenumber
+	set ruler
+	set clipboard=unnamedplus
+	set history=500
+	set nrformats=
+	set timeout
+	set ttimeout
+	set ttimeoutlen=50
+	syntax on
+	set ff=unix
+]])
 
--- 代码缩进
-vim.cmd("set noexpandtab")
-vim.cmd("set tabstop=4")
-vim.cmd("set shiftwidth=4")
-vim.cmd("set softtabstop=4")
-vim.cmd("set autoindent")
-vim.cmd("set smarttab")
-
--- 代码折叠
-vim.cmd("set foldenable")
-vim.cmd("set fdm=manual")
-
-vim.cmd("set wildmenu")
-vim.cmd("set signcolumn=yes")
-vim.cmd("set backspace=indent,eol,start")
-vim.cmd("set scrolloff=8")
-vim.cmd("set sidescrolloff=5")
-vim.cmd("set lazyredraw")
+-- 代码缩进和折叠
+vim.cmd([[
+	set noexpandtab
+	set tabstop=4
+	set shiftwidth=4
+	set softtabstop=4
+	set autoindent
+	set smarttab
+	set foldenable
+	set fdm=manual
+]])
 
 -- 搜索
-vim.cmd("set ignorecase")
-vim.cmd("set smartcase")
-vim.cmd("set hlsearch")
-vim.cmd("set incsearch")
-
--- 编码
-vim.cmd("set encoding=utf-8")
-vim.cmd("set fileencoding=utf-8")
+vim.cmd([[
+	set ignorecase
+	set smartcase
+	set hlsearch
+	set incsearch
+]])
 
 -- 其他
-vim.cmd("set showmatch")
-vim.cmd("set matchtime=2")
-vim.cmd("set formatoptions+=m")
-vim.cmd("set formatoptions+=B")
-vim.cmd("set hidden")
-vim.cmd("set updatetime=100")
-vim.cmd("set cmdheight=1")
-
-vim.cmd("let $NVIM_TUI_ENABLE_TRUE_COLOR=1")
-vim.cmd("set termguicolors")
+vim.cmd([[
+	set encoding=utf-8
+	set fileencoding=utf-8
+	set wildmenu
+	set signcolumn=yes
+	set backspace=indent,eol,start
+	set scrolloff=8
+	set sidescrolloff=5
+	set lazyredraw
+	set showmatch
+	set matchtime=2
+	set hidden
+	set updatetime=100
+	set cmdheight=1
+	set formatoptions+=m
+	set formatoptions+=B
+	set termguicolors
+	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+]])
 
 -- 打开nvim时光标停留在上次退出时的位置
 vim.cmd([[au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif]])
--- vim.cmd("")
 
 --
 -- #basic/keymap
