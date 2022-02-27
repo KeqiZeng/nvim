@@ -186,7 +186,7 @@ require("packer").startup(function()
 	use("p00f/nvim-ts-rainbow")
 	-- Surround
 	use({
-		"blackCauldron7/surround.nvim",
+		"Mephistophiles/surround.nvim",
 		config = function()
 			require("surround").setup({
 				mappings_style = "sandwich",
