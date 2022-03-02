@@ -128,24 +128,24 @@ require("packer").startup(function()
 	use("goolord/alpha-nvim")
 	-- Colorscheme
 	use("olimorris/onedarkpro.nvim")
-	-- nvim-gps
-	use({
-		"SmiteshP/nvim-gps",
-		requires = "nvim-treesitter/nvim-treesitter",
-	})
 	-- LuaLine
 	use({
 		"nvim-lualine/lualine.nvim",
 		requires = { "kyazdani42/nvim-web-devicons", opt = true },
 	})
+	-- nvim-gps
+	use({
+		"SmiteshP/nvim-gps",
+		requires = "nvim-treesitter/nvim-treesitter",
+	})
+	-- Bufferline
+	use({ "akinsho/bufferline.nvim", requires = "kyazdani42/nvim-web-devicons" })
 	-- Telescope
 	use({
 		"nvim-telescope/telescope.nvim",
 		requires = { "nvim-lua/plenary.nvim" },
 	})
 	use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" })
-	-- Bufferline
-	use({ "akinsho/bufferline.nvim", requires = "kyazdani42/nvim-web-devicons" })
 	-- Nvim-tree
 	use({
 		"kyazdani42/nvim-tree.lua",
@@ -194,10 +194,16 @@ require("packer").startup(function()
 			})
 		end,
 	})
-	-- -- Accelerated-jk
+	-- Accelerated-jk
 	use("xiyaowong/accelerated-jk.nvim")
+	-- Capslock
+	use({ "tpope/vim-capslock", lock = true })
+	-- Dial
+	use("monaqa/dial.nvim")
 	-- Gitsigns
 	use({ "lewis6991/gitsigns.nvim", requires = "nvim-lua/plenary.nvim" })
+	-- FTerm
+	use("numToStr/FTerm.nvim")
 	-- Lazygit
 	use("kdheepak/lazygit.nvim")
 	-- Colorizer
@@ -216,7 +222,16 @@ require("packer").startup(function()
 	use("neovim/nvim-lspconfig") -- Collection of configurations for built-in LSP client
 	use("onsails/lspkind-nvim")
 	use("ray-x/lsp_signature.nvim")
-	use("tami5/lspsaga.nvim")
+	use("kosayoda/nvim-lightbulb")
+	use({
+		"weilbith/nvim-code-action-menu",
+		cmd = "CodeActionMenu",
+	})
+	use({
+		"filipdutescu/renamer.nvim",
+		branch = "master",
+		requires = { { "nvim-lua/plenary.nvim" } },
+	})
 
 	-- Cmp
 	use("hrsh7th/nvim-cmp") -- Autocompletion plugin
@@ -232,8 +247,6 @@ require("packer").startup(function()
 	-- Language
 	-- markdown
 	use({ "iamcco/markdown-preview.nvim", ft = "markdown", run = "cd app && yarn install" })
-	-- latex
-	-- use({ "lervag/vimtex", ft = "tex" })
 	-- Code_runner
 	use({ "CRAG666/code_runner.nvim", requires = "nvim-lua/plenary.nvim" })
 end)
@@ -367,7 +380,7 @@ require("lualine").setup({
 		disabled_filetypes = {},
 	},
 	sections = {
-		lualine_a = { "mode" },
+		lualine_a = { "mode", { "CapsLockStatusline" } },
 		lualine_b = { "branch", "diff", "diagnostics" },
 		lualine_c = { "filename", { gps.get_location, cond = gps.is_available } },
 		lualine_x = { "encoding", "filetype", "fileformat" },
@@ -422,7 +435,8 @@ onedarkpro.setup({
 		Identifier = { link = "Operator" },
 		Constant = { link = "Operator" },
 		TSVariable = { fg = "${pink}" },
-		Comment = { fg = "#888888", bg = "#2e2e2e", style = "italic" },
+		Comment = { fg = "#888888", bg = "${bg}", style = "italic" },
+		TermCursor = { bg = "#c9c9c9" },
 		IndentBlanklineIndent1 = { fg = "#3f3f3f" },
 		IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
@@ -463,7 +477,11 @@ require("telescope").setup({
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
-		preview_width = 0.9,
+		preview_width = 0.8,
+		layout_config = {
+			prompt_position = "top",
+		},
+		sorting_strategy = "ascending",
 		file_ignore_patterns = { ".git", ".cache", ".DS_Store" },
 		mappings = {
 			i = {
@@ -844,15 +862,73 @@ map("n", "<C-e>", [[<cmd>NvimTreeToggle<CR>]], opt)
 -- #jk
 --
 require("accelerated-jk").setup({
-	-- equal to
-	-- nmap <silent> j <cmd>lua require'accelerated-jk'.command('gj')<cr>
-	-- nmap <silent> k <cmd>lua require'accelerated-jk'.command('gk')<cr>
 	mappings = { j = "gj", k = "gk" },
 	-- If the interval of key-repeat takes more than `acceleration_limit` ms, the step is reset
 	acceleration_limit = 150,
 	-- acceleration steps
 	acceleration_table = { 7, 16, 23, 28, 31 },
 })
+
+--
+-- #capslock
+--
+-- <C-l> in insert mode to toggle capslock
+
+--
+-- #dial
+--
+local augend = require("dial.augend")
+require("dial.config").augends:register_group({
+	-- default augends used when no group name is specified
+	default = {
+		augend.integer.alias.binary,
+		augend.integer.alias.octal,
+		augend.integer.alias.decimal, -- nonnegative decimal number (0, 1, 2, 3, ...)
+		augend.integer.alias.hex, -- nonnegative hex number  (0x01, 0x1a1f, etc.)
+		augend.date.alias["%Y-%m-%d"],
+		augend.date.alias["%Y年%-m月%-d日"],
+		augend.date.alias["%H:%M"],
+		augend.constant.alias.alpha,
+		augend.constant.alias.Alpha,
+		augend.constant.alias.bool,
+		augend.constant.new({
+			elements = { "TRUE", "FALSE" },
+			word = true,
+			cyclic = true,
+		}),
+		augend.constant.new({
+			elements = { "and", "or" },
+			word = true, -- if false, "sand" is incremented into "sor", "doctor" into "doctand", etc.
+			cyclic = true, -- "or" is incremented into "and".
+		}),
+		augend.constant.new({
+			elements = { "&&", "||" },
+			word = false,
+			cyclic = true,
+		}),
+		augend.constant.new({
+			elements = { "(", "[", "{" },
+			word = false,
+			cyclic = true,
+		}),
+		augend.constant.new({
+			elements = { ")", "]", "}" },
+			word = false,
+			cyclic = true,
+		}),
+		augend.constant.new({
+			elements = { "else if", "elif" },
+			word = true,
+			cyclic = true,
+		}),
+	},
+})
+map("n", "<C-a>", require("dial.map").inc_normal(), opt)
+map("n", "<C-x>", require("dial.map").dec_normal(), opt)
+map("v", "<C-a>", require("dial.map").inc_visual(), opt)
+map("v", "<C-x>", require("dial.map").dec_visual(), opt)
+map("v", "g<C-a>", require("dial.map").inc_gvisual(), opt)
+map("v", "g<C-x>", require("dial.map").dec_gvisual(), opt)
 
 --
 -- #gitsigns
@@ -923,6 +999,22 @@ require("gitsigns").setup({
 })
 
 --
+-- #fterm
+--
+require("FTerm").setup({
+	ft = "FTerm",
+	border = "single",
+	dimensions = {
+		height = 0.85,
+		width = 0.8,
+		x = 0.5,
+		y = 0.3,
+	},
+})
+map("n", "<C-t>", [[<cmd>lua require("FTerm").toggle()<CR>]], opt)
+map("t", "<C-t>", [[<C-n><cmd>lua require("FTerm").toggle()<CR>]], opt)
+
+--
 -- #lazygit
 --
 vim.g.lazygit_floating_window_use_plenary =
@@ -967,6 +1059,48 @@ vim.cmd([[autocmd InsertEnter * :silent lua InsertE()]])
 --
 -- #lspconfig
 --
+vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guibg=#2e2e2e]])
+vim.cmd([[autocmd! ColorScheme * highlight FloatBorder guifg=#e9e9e9 guibg=#2e2e2e]])
+local border = {
+	{ "╭", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╮", "FloatBorder" },
+	{ "│", "FloatBorder" },
+	{ "╯", "FloatBorder" },
+	{ "─", "FloatBorder" },
+	{ "╰", "FloatBorder" },
+	{ "│", "FloatBorder" },
+}
+-- LSP settings (for overriding per client)
+local handlers = {
+	["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
+	["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+}
+
+vim.diagnostic.config({
+	virtual_text = false,
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = false,
+})
+local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+for type, icon in pairs(signs) do
+	local hl = "DiagnosticSign" .. type
+	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
+local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+	opts = opts or {}
+	opts.border = opts.border or border
+	return orig_util_open_floating_preview(contents, syntax, opts, ...)
+end
+
+vim.cmd([[autocmd! CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]])
+map("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opt)
+map("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opt)
+
 local lspconfig = require("lspconfig")
 local on_attach = function(_, bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", [[<cmd>lua vim.lsp.buf.definition()<CR>]], opt)
@@ -974,13 +1108,10 @@ local on_attach = function(_, bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gt", [[<cmd>lua vim.lsp.buf.type_definition()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gr", [[<cmd>lua require('telescope.builtin').lsp_references()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gi", [[<cmd>lua require('telescope.builtin').lsp_implementations()<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "gp", [[<cmd>Lspsaga preview_definition<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>rn", [[<cmd>Lspsaga rename<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>a", [[<cmd>Lspsaga code_action<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "x", "<LEADER>a", [[:<c-u>Lspsaga range_code_action<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", [[<cmd>Lspsaga hover_doc<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "]d", [[<cmd>Lspsaga diagnostic_jump_next<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "[d", [[<cmd>Lspsaga diagnostic_jump_prev<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>rn", [[<cmd>lua require("renamer").rename()<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "v", "<LEADER>rn", [[<cmd>lua require("renamer").rename()<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "K", [[<cmd>lua vim.lsp.buf.hover()<CR>]], opt)
+	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-k>", [[<cmd>lua vim.lsp.buf.signature_help()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>ll", [[<cmd>TexlabBuild<CR>]], opt)
@@ -1062,6 +1193,7 @@ for _, lsp in ipairs(servers) do
 	lspconfig[lsp].setup({
 		on_attach = on_attach,
 		capabilities = capabilities,
+		handlers = handlers,
 		single_file_support = true,
 	})
 end
@@ -1069,6 +1201,7 @@ end
 require("lspconfig").texlab.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
+	handlers = handlers,
 	settings = {
 		texlab = {
 			auxDirectory = ".",
@@ -1116,9 +1249,58 @@ require("lspconfig").texlab.setup({
 require("lsp_signature").setup()
 
 --
+-- #lightbulb
+--
+vim.cmd([[autocmd CursorHold,CursorHoldI * lua require'nvim-lightbulb'.update_lightbulb()]])
+
+--
+-- #code_action
+--
+map("n", "<LEADER>a", [[<cmd>CodeActionMenu<CR>]], opt)
+map("v", "<LEADER>a", [[<cmd>CodeActionMenu<CR>]], opt)
+vim.g.code_action_menu_show_details = false
+
+--
+-- #renamer
+--
+require("renamer").setup({
+	-- The popup title, shown if `border` is true
+	title = "Rename",
+	-- The padding around the popup content
+	padding = {
+		top = 0,
+		left = 0,
+		bottom = 0,
+		right = 0,
+	},
+	-- The minimum width of the popup
+	min_width = 15,
+	-- The maximum width of the popup
+	max_width = 45,
+	-- Whether or not to shown a border around the popup
+	border = true,
+	-- The characters which make up the border
+	border_chars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+	-- Whether or not to highlight the current word references through LSP
+	show_refs = true,
+	-- Whether or not to add resulting changes to the quickfix list
+	with_qf_list = true,
+	-- Whether or not to enter the new name through the UI or Neovim's `input`
+	-- prompt
+	with_popup = true,
+	-- The keymaps available while in the `renamer` buffer. The example below
+	-- overrides the default values, but you can add others as well.
+	mappings = {},
+	-- Custom handler to be run after successfully renaming the word. Receives
+	-- the LSP 'textDocument/rename' raw response as its parameter.
+	handler = nil,
+})
+
+--
 -- #cmp
 --
 local has_words_before = function()
+	---@diagnostic disable-next-line: deprecated
 	local line, col = unpack(vim.api.nvim_win_get_cursor(0))
 	return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
@@ -1232,78 +1414,9 @@ require("cmp_dictionary").setup({
 })
 
 --
--- #lspsaga
---
-local lspsaga = require("lspsaga")
-lspsaga.setup({ -- defaults ...
-	debug = false,
-	use_saga_diagnostic_sign = true,
-	-- diagnostic sign
-	error_sign = "",
-	warn_sign = "",
-	hint_sign = "",
-	infor_sign = "",
-	diagnostic_header_icon = "   ",
-	-- code action title icon
-	code_action_icon = " ",
-	code_action_prompt = {
-		enable = true,
-		sign = true,
-		sign_priority = 36,
-		virtual_text = false,
-	},
-	-- finder_definition_icon = "  ",
-	-- finder_reference_icon = "  ",
-	-- max_preview_lines = 10,
-	-- finder_action_keys = {
-	--   open = "o",
-	--   vsplit = "v",
-	--   split = "x",
-	--   quit = "q",
-	--   scroll_down = "<C-j>",
-	--   scroll_up = "<C-k>",
-	-- },
-	code_action_keys = {
-		quit = "<C-e>",
-		exec = "<CR>",
-	},
-	rename_action_keys = {
-		quit = "<C-e>",
-		exec = "<CR>",
-	},
-	definition_preview_icon = "  ",
-	border_style = "single",
-	rename_prompt_prefix = "➤",
-	server_filetype_map = {},
-	diagnostic_prefix_format = "%d. ",
-})
-
---- In lsp attach function
--- map( "n", "gp", "<cmd>Lspsaga preview_definition<CR>", opt)
--- map( "n", "<LEADER>rn", "<cmd>Lspsaga rename<CR>", opt)
--- map( "n", "<LEADER>a", "<cmd>Lspsaga code_action<CR>", opt)
--- map( "x", "<LEADER>a", ":<c-u>Lspsaga range_code_action<CR>", opt)
--- map( "n", "K",  "<cmd>Lspsaga hover_doc<CR>", opt)
--- map( "n", "]d", "<cmd>Lspsaga diagnostic_jump_next<CR>", opt)
--- map( "n", "[d", "<cmd>Lspsaga diagnostic_jump_prev<CR>", opt)
-map("n", "<C-u>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<CR>]], opt)
-map("n", "<C-d>", [[<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>]], opt)
-map("n", "<C-t>", [[<cmd>Lspsaga open_floaterm<CR>]], opt)
-map("t", "<C-t>", [[<cmd>Lspsaga close_floaterm<CR>]], opt)
-
---
 -- #mkdp
 --
 map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
-
---
--- #tex
---
--- vim.g.tex_flavor = "latex"
--- -- vim.g.vimtex_view_method = '/Applications/Skim.app/Contents/MacOS/Skim'
--- vim.g.vimtex_view_method = "skim"
--- vim.g.vimtex_view_general_viewer = "/Applications/Skim.app/Contents/SharedSupport/displayline"
--- vim.g.vimtex_view_general_options = "-r @line @pdf @tex"
 
 --
 -- #code_runner
