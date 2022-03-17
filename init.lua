@@ -179,11 +179,30 @@ require("packer").startup(function()
 	-- Autopairs
 	use({
 		"windwp/nvim-autopairs",
-		require("nvim-autopairs").setup(),
+		event = "InsertEnter",
+		config = function()
+			require("nvim-autopairs").setup()
+		end,
 	})
-	use("windwp/nvim-ts-autotag")
+	use({
+		"windwp/nvim-ts-autotag",
+		event = "InsertEnter",
+		config = function()
+			require("nvim-ts-autotag").setup()
+		end,
+	})
 	-- Rainbow
 	use("p00f/nvim-ts-rainbow")
+	-- Numb
+	use({ "nacro90/numb.nvim", require("numb").setup() })
+	-- Matchup
+	use({
+		"andymass/vim-matchup",
+		event = "CursorMoved",
+		config = function()
+			vim.g.matchup_matchparen_offscreen = { method = "popup" }
+		end,
+	})
 	-- Surround
 	use({
 		"Mephistophiles/surround.nvim",
@@ -194,10 +213,10 @@ require("packer").startup(function()
 			})
 		end,
 	})
+	-- Visual_multi
+	use("mg979/vim-visual-multi")
 	-- Accelerated-jk
 	use("xiyaowong/accelerated-jk.nvim")
-	-- Capslock
-	use({ "tpope/vim-capslock", lock = true })
 	-- Dial
 	use("monaqa/dial.nvim")
 	-- Gitsigns
@@ -380,9 +399,25 @@ require("lualine").setup({
 		disabled_filetypes = {},
 	},
 	sections = {
-		lualine_a = { "mode", { "CapsLockStatusline" } },
-		lualine_b = { "branch", "diff", "diagnostics" },
+		lualine_a = { "mode" },
+		lualine_b = {
+			"branch",
+			{
+				"diff",
+				colored = true,
+				diff_color = {
+					-- added = "diffadded",
+					-- modified = "diffchanged",
+					-- removed = "diffremoved",
+					added = { fg = "#98c378", bg = "#3a3a3a" },
+					modified = { fg = "#e5c07b", bg = "#3a3a3a" },
+					removed = { fg = "#f15e64", bg = "#3a3a3a" },
+				},
+			},
+			"diagnostics",
+		},
 		lualine_c = { "filename", { gps.get_location, cond = gps.is_available } },
+		-- lualine_c = { "filename" },
 		lualine_x = { "encoding", "filetype", "fileformat" },
 		lualine_y = { "progress" },
 		lualine_z = { "location" },
@@ -415,6 +450,7 @@ onedarkpro.setup({
 	colors = {
 		onedark = {
 			bg = "#2e2e2e",
+			bg_statusline = "#3a3a3a",
 			fg = "#e9e9e9",
 			red = "#f15e64",
 			orange = "#e88854",
@@ -437,7 +473,7 @@ onedarkpro.setup({
 		TSVariable = { fg = "${pink}" },
 		Comment = { fg = "#888888", bg = "${bg}", style = "italic" },
 		TermCursor = { bg = "#c9c9c9" },
-		IndentBlanklineIndent1 = { fg = "#3f3f3f" },
+		IndentBlanklineIndent1 = { fg = "#484848" },
 		IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent4 = { link = "IndentBlanklineIndent1" },
@@ -691,15 +727,16 @@ require("nvim-treesitter.configs").setup({
 		"c",
 		"cpp",
 		"cmake",
+		"rust",
+		"lua",
 		"go",
 		"gomod",
 		"python",
+		"markdown",
+		"html",
 		"bash",
-		"fish",
-		"lua",
 		"latex",
 		"bibtex",
-		"html",
 		"dockerfile",
 		"json",
 		"toml",
@@ -754,9 +791,6 @@ require("nvim-treesitter.configs").setup({
 			"#e5c07b",
 			"#ff9999",
 		},
-	},
-	autotag = {
-		enable = true,
 	},
 	indent = {
 		enable = true,
@@ -859,6 +893,20 @@ require("nvim-tree").setup({
 map("n", "<C-e>", [[<cmd>NvimTreeToggle<CR>]], opt)
 
 --
+-- #visual_multi
+--
+vim.cmd([[
+let g:VM_maps = {}
+let g:VM_maps["Add Cursor Down"]             = '<C-j>'
+let g:VM_maps["Add Cursor Up"]               = '<C-k>'
+]])
+-- select words with Ctrl-N
+-- press n/N to get next/previous occurrence
+-- press [/] to select next/previous cursor
+-- press q to skip current and get next occurrence
+-- press Q to remove current cursor/selection
+
+--
 -- #jk
 --
 require("accelerated-jk").setup({
@@ -868,11 +916,6 @@ require("accelerated-jk").setup({
 	-- acceleration steps
 	acceleration_table = { 7, 16, 23, 28, 31 },
 })
-
---
--- #capslock
---
--- <C-l> in insert mode to toggle capslock
 
 --
 -- #dial
@@ -1097,9 +1140,10 @@ function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 	return orig_util_open_floating_preview(contents, syntax, opts, ...)
 end
 
-vim.cmd([[autocmd! CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]])
-map("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opt)
-map("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<CR>", opt)
+-- vim.cmd([[autocmd! CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]])
+map("n", "J", [[<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>]], opt)
+map("n", "[d", [[<cmd>lua vim.diagnostic.goto_prev()<CR>]], opt)
+map("n", "]d", [[<cmd>lua vim.diagnostic.goto_next()<CR>]], opt)
 
 local lspconfig = require("lspconfig")
 local on_attach = function(_, bufnr)
@@ -1130,6 +1174,13 @@ local on_attach = function(_, bufnr)
         augroup GolangFormatting
             autocmd!
             autocmd BufWritePost *.go silent !gofmt -w %
+        augroup END
+        ]])
+
+	vim.cmd([[
+        augroup RustFormatting
+            autocmd!
+            autocmd BufWritePost *.rs silent !rustfmt %
         augroup END
         ]])
 
@@ -1187,6 +1238,7 @@ local servers = {
 	"sumneko_lua",
 	"pyright",
 	"remark_ls",
+	"rust_analyzer",
 	-- "texlab",
 }
 for _, lsp in ipairs(servers) do
