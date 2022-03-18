@@ -223,8 +223,6 @@ require("packer").startup(function()
 	use({ "lewis6991/gitsigns.nvim", requires = "nvim-lua/plenary.nvim" })
 	-- FTerm
 	use("numToStr/FTerm.nvim")
-	-- Lazygit
-	use("kdheepak/lazygit.nvim")
 	-- Colorizer
 	use({
 		"norcalli/nvim-colorizer.lua",
@@ -1056,13 +1054,6 @@ require("FTerm").setup({
 })
 map("n", "<C-t>", [[<cmd>lua require("FTerm").toggle()<CR>]], opt)
 map("t", "<C-t>", [[<C-n><cmd>lua require("FTerm").toggle()<CR>]], opt)
-
---
--- #lazygit
---
-vim.g.lazygit_floating_window_use_plenary =
-	1, ---@diagnostic disable-next-line: redundant-value
-	map("n", "<C-g>", [[<cmd>LazyGit<CR>]], opt)
 
 --
 -- #hlslens
