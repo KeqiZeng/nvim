@@ -3,7 +3,6 @@
 cd ~
 
 # Provider
-pip2 install pynvim
 pip install neovim pynvim
 npm install -g neovim
 sudo gem install neovim

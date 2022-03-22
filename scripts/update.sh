@@ -5,7 +5,6 @@ cd ~
 brew upgrade nvim
 
 # Provider
-pip2 install --upgrade pynvim
 pip install --upgrade neovim pynvim
 npm update -g neovim
 sudo gem update neovim
