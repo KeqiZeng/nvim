@@ -75,11 +75,14 @@ local opt = { noremap = true, silent = true }
 map("n", "H", "0", opt)
 map("n", "L", "$", opt)
 map("n", "<BACKSPACE>", [[<cmd>nohl<CR>]], opt)
-map("n", "<UP>", [[<cmd>res +5<CR>]], opt)
-map("n", "<DOWN>", [[<cmd>res -5<CR>]], opt)
-map("n", "<LEFT>", [[<cmd>vertical resize -5<CR>]], opt)
-map("n", "<RIGHT>", [[<cmd>vertical resize +5<CR>]], opt)
+map("n", "<C-l>", [[:vertical resize ]], opt)
+-- map("n", "<UP>", [[<cmd>res +5<CR>]], opt)
+-- map("n", "<DOWN>", [[<cmd>res -5<CR>]], opt)
+-- map("n", "<LEFT>", [[<cmd>vertical resize -5<CR>]], opt)
+-- map("n", "<RIGHT>", [[<cmd>vertical resize +5<CR>]], opt)
 map("n", "<LEADER>uu", [[<cmd>PackerSync<CR>]], opt)
+map("t", "<DOWN>", [[<C-\><C-N>j]], opt)
+map("t", "<UP>", [[<C-\><C-N>k]], opt)
 
 function DeletAllBuffers()
 	vim.api.nvim_exec(
@@ -1460,6 +1463,17 @@ require("cmp_dictionary").setup({
 -- #mkdp
 --
 map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
+
+--
+-- #GolangLint
+--
+vim.cmd([[
+	augroup GolangLint
+		autocmd!
+		autocmd FileType go command! GolintFile set splitbelow | :sp | res -3 | :term golangci-lint run %
+		autocmd FileType go command! GolintDir set splitbelow | :sp | res -3 | :term golangci-lint run
+	augroup END
+]])
 
 --
 -- #code_runner
