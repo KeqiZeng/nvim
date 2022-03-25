@@ -63,8 +63,16 @@ vim.cmd([[
 	let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 ]])
 
+-- 退出时记录光标位置，标记为q
+vim.cmd([[
+	augroup SetquitMark
+		autocmd!
+		autocmd VimLeavePre * :mark q
+	augroup END
+]])
+
 -- 打开nvim时光标停留在上次退出时的位置
-vim.cmd([[au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif]])
+-- vim.cmd([[au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif]])
 
 --
 -- #basic/keymap
@@ -75,12 +83,12 @@ local opt = { noremap = true, silent = true }
 map("n", "H", "0", opt)
 map("n", "L", "$", opt)
 map("n", "<BACKSPACE>", [[<cmd>nohl<CR>]], opt)
-map("n", "<C-l>", [[:vertical resize ]], opt)
--- map("n", "<UP>", [[<cmd>res +5<CR>]], opt)
--- map("n", "<DOWN>", [[<cmd>res -5<CR>]], opt)
--- map("n", "<LEFT>", [[<cmd>vertical resize -5<CR>]], opt)
--- map("n", "<RIGHT>", [[<cmd>vertical resize +5<CR>]], opt)
 map("n", "<LEADER>uu", [[<cmd>PackerSync<CR>]], opt)
+map("n", "<LEADER><UP>", [[<cmd>res +5<CR>]], opt)
+map("n", "<LEADER><DOWN>", [[<cmd>res -5<CR>]], opt)
+map("n", "<LEADER><LEFT>", [[<cmd>vertical resize -5<CR>]], opt)
+map("n", "<LEADER><RIGHT>", [[<cmd>vertical resize +5<CR>]], opt)
+-- scroll in terminal
 map("t", "<DOWN>", [[<C-\><C-N>j]], opt)
 map("t", "<UP>", [[<C-\><C-N>k]], opt)
 
@@ -172,6 +180,10 @@ require("packer").startup(function()
 		run = ":TSUpdate",
 	})
 	use("nvim-treesitter/nvim-treesitter-textobjects")
+	use({
+		"nvim-treesitter/playground",
+		cmd = "TSPlaygroundToggle",
+	})
 	-- Spellsitter
 	use({
 		"lewis6991/spellsitter.nvim",
@@ -474,7 +486,20 @@ onedarkpro.setup({
 		TSVariable = { fg = "${pink}" },
 		Comment = { fg = "#888888", bg = "${bg}", style = "italic" },
 		TermCursor = { bg = "#c9c9c9" },
-		IndentBlanklineIndent1 = { fg = "#484848" },
+		-- markdown
+		TSTitle = { fg = "${blue}" },
+		TSStrong = { fg = "${blue}" },
+		TSEmphasis = { fg = "${green}" },
+		TSTextReference = { fg = "${purple}" },
+		TSStrike = { fg = "${orange}" },
+		TSUnderline = { fg = "${purple}" },
+		TSURI = { fg = "${orange}" },
+		TSLiteral = { fg = "${pink}" },
+		TSMath = { fg = "${pink}" },
+		TSPunctDelimiter = { fg = "${yellow}" },
+		TSPunctSpecial = { fg = "${yellow}" },
+		-- indentline
+		IndentBlanklineIndent1 = { fg = "#494949" },
 		IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent4 = { link = "IndentBlanklineIndent1" },
@@ -722,6 +747,15 @@ require("indent_blankline").setup({
 --
 -- #treesitter
 --
+local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+parser_config.markdown = {
+	install_info = {
+		url = "~/OpenSouce/tree-sitter-markdown",
+		files = { "src/parser.c", "src/scanner.cc" },
+	},
+	filetype = "markdown",
+}
+
 require("nvim-treesitter.configs").setup({
 	-- One of "all", "maintained" (parsers with maintainers), or a list of languages
 	ensure_installed = {
@@ -795,6 +829,25 @@ require("nvim-treesitter.configs").setup({
 	},
 	indent = {
 		enable = true,
+	},
+
+	playground = {
+		enable = true,
+		disable = {},
+		updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+		persist_queries = false, -- Whether the query persists across vim sessions
+		keybindings = {
+			toggle_query_editor = "o",
+			toggle_hl_groups = "i",
+			toggle_injected_languages = "t",
+			toggle_anonymous_nodes = "a",
+			toggle_language_display = "I",
+			focus_language = "f",
+			unfocus_language = "F",
+			update = "R",
+			goto_node = "<cr>",
+			show_help = "?",
+		},
 	},
 })
 
@@ -948,21 +1001,6 @@ require("dial.config").augends:register_group({
 		augend.constant.new({
 			elements = { "&&", "||" },
 			word = false,
-			cyclic = true,
-		}),
-		augend.constant.new({
-			elements = { "(", "[", "{" },
-			word = false,
-			cyclic = true,
-		}),
-		augend.constant.new({
-			elements = { ")", "]", "}" },
-			word = false,
-			cyclic = true,
-		}),
-		augend.constant.new({
-			elements = { "else if", "elif" },
-			word = true,
 			cyclic = true,
 		}),
 	},
@@ -1152,9 +1190,6 @@ local on_attach = function(_, bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<C-k>", [[<cmd>lua vim.lsp.buf.signature_help()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>ll", [[<cmd>TexlabBuild<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>lv", [[<cmd>TexlabForward<CR>]], opt)
-	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>lc", [[<cmd>silent !latexmk -c %<CR><cmd>echo "latexmk: clean up!"<CR>]], opt)
 
 	-- #formatter
 	vim.cmd([[
@@ -1465,7 +1500,7 @@ require("cmp_dictionary").setup({
 map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
 
 --
--- #GolangLint
+-- #golangci
 --
 vim.cmd([[
 	augroup GolangLint
@@ -1473,6 +1508,15 @@ vim.cmd([[
 		autocmd FileType go command! GolintFile set splitbelow | :sp | res -3 | :term golangci-lint run %
 		autocmd FileType go command! GolintDir set splitbelow | :sp | res -3 | :term golangci-lint run
 	augroup END
+]])
+
+--
+-- #latexmk
+--
+vim.cmd([[
+	augroup Latexmk
+	autocmd!
+	autocmd FileType tex noremap <LEADER>ll :TexlabBuild<CR> | noremap <LEADER>lv :TexlabForward<CR> | noremap <LEADER>lc :silent !latexmk -c %<CR>:echo "latexmk: clean up!"<CR>
 ]])
 
 --
