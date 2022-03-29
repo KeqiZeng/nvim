@@ -1,0 +1,7 @@
+{
+  "main function": {
+    "prefix": "main",
+    "body": "func main() {\n\t$0\n}",
+    "description": "Snippet for main function"
+  }
+}

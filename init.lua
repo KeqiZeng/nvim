@@ -1485,7 +1485,9 @@ cmp.setup({
 	},
 })
 
-require("luasnip.loaders.from_vscode").load()
+-- require("luasnip.loaders.from_vscode").load()
+local snippets_path = vim.fn.stdpath("data") .. "/site/pack/packer/start/friendly-snippets"
+require("luasnip.loaders.from_vscode").load({ paths = { "~/.config/nvim/snippets", snippets_path } })
 
 -- Dictionary
 require("cmp_dictionary").setup({
