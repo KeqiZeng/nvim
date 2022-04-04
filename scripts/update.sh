@@ -35,3 +35,6 @@ brew upgrade ripgrep fd
 pip install --upgrade autopep8
 brew upgrade stylua shfmt clang-format prettier
 conda update -c conda-forge latexindent.pl
+
+# lint
+brew install golangci-lint

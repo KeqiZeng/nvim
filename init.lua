@@ -220,7 +220,7 @@ require("packer").startup(function()
 	})
 	-- Surround
 	use({
-		"Mephistophiles/surround.nvim",
+		"ur4ltz/surround.nvim",
 		config = function()
 			require("surround").setup({
 				mappings_style = "sandwich",
@@ -857,18 +857,18 @@ require("nvim-treesitter.configs").setup({
 require("nvim-tree").setup({
 	disable_netrw = true,
 	hijack_netrw = true,
-	open_on_setup = false,
-	ignore_ft_on_setup = {},
-	auto_close = true,
-	open_on_tab = false,
 	hijack_cursor = false,
+	open_on_setup = false,
+	open_on_tab = false,
+	ignore_ft_on_setup = {},
 	update_cwd = true,
+	sort_by = "name",
 	update_to_buf_dir = {
 		enable = true,
 		auto_open = true,
 	},
 	diagnostics = {
-		enable = false,
+		enable = true,
 		icons = {
 			hint = "",
 			info = "",
@@ -1191,7 +1191,7 @@ local on_attach = function(_, bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wa", [[<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "<LEADER>wl", [[<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>]], opt)
 
-	-- #formatter
+	-- #fmt
 	vim.cmd([[
         augroup CFormatting
             autocmd!
@@ -1502,13 +1502,20 @@ require("cmp_dictionary").setup({
 map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
 
 --
--- #golangci
+-- #golang
 --
 vim.cmd([[
 	augroup GolangLint
 		autocmd!
 		autocmd FileType go command! GolintFile set splitbelow | :sp | res -3 | :term golangci-lint run %
 		autocmd FileType go command! GolintDir set splitbelow | :sp | res -3 | :term golangci-lint run
+	augroup END
+]])
+
+vim.cmd([[
+	augroup Goimports
+		autocmd!
+		autocmd FileType go command! Goimport silent !goimports -w %
 	augroup END
 ]])
 
