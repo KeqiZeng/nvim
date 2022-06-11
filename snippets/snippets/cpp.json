@@ -1,0 +1,7 @@
+{
+  "Main function template": {
+    "prefix": "main",
+    "body": ["int main () {", "\t$1", "\treturn 0;", "}"],
+    "description": "A simple main function for a C++ program"
+  }
+}

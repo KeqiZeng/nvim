@@ -150,7 +150,7 @@ require("packer").startup(function()
 		requires = "nvim-treesitter/nvim-treesitter",
 	})
 	-- Bufferline
-	use({ "akinsho/bufferline.nvim", requires = "kyazdani42/nvim-web-devicons" })
+	use({ "akinsho/bufferline.nvim", tag = "*", requires = "kyazdani42/nvim-web-devicons" })
 	-- Telescope
 	use({
 		"nvim-telescope/telescope.nvim",
@@ -171,7 +171,7 @@ require("packer").startup(function()
 	-- Cursorword
 	use("yamatsum/nvim-cursorline")
 	-- Tidy
-	use({ "McAuleyPenney/tidy.nvim", event = "BufWritePre" })
+	use({ "mcauley-penney/tidy.nvim", event = "BufWritePre" })
 	-- Indentline
 	use("lukas-reineke/indent-blankline.nvim")
 	-- Treesitter
@@ -419,12 +419,9 @@ require("lualine").setup({
 				"diff",
 				colored = true,
 				diff_color = {
-					-- added = "diffadded",
-					-- modified = "diffchanged",
-					-- removed = "diffremoved",
-					added = { fg = "#98c378", bg = "#3a3a3a" },
-					modified = { fg = "#e5c07b", bg = "#3a3a3a" },
-					removed = { fg = "#f15e64", bg = "#3a3a3a" },
+					added = { fg = "#98c378" },
+					modified = { fg = "#e5c07b" },
+					removed = { fg = "#f15e64" },
 				},
 			},
 			"diagnostics",
@@ -464,6 +461,7 @@ onedarkpro.setup({
 		onedark = {
 			bg = "#2e2e2e",
 			bg_statusline = "#3a3a3a",
+			fg_gutter = "#4a4a4a",
 			fg = "#e9e9e9",
 			red = "#f15e64",
 			orange = "#e88854",
@@ -486,6 +484,20 @@ onedarkpro.setup({
 		TSVariable = { fg = "${pink}" },
 		Comment = { fg = "#888888", bg = "${bg}", style = "italic" },
 		TermCursor = { bg = "#c9c9c9" },
+		-- telescope
+		TelescopeNormal = { fg = "${fg}" },
+		TelescopeBorder = { fg = "${fg}", bg = "${bg}" },
+		TelescopeSelection = { fg = "${pink}" },
+		TelescopeSelectionCaret = { fg = "${pink}" },
+		TelescopeResultsTitle = { fg = "${bg}", bg = "${pink}" },
+		TelescopeMatching = { fg = "${green}" },
+		TelescopePreviewBorder = { fg = "${fg}", bg = "${bg}" },
+		TelescopePreviewTitle = { fg = "${bg}", bg = "${green}" },
+		TelescopePromptBorder = { fg = "${fg}", bg = "${bg}" },
+		TelescopePromptPrefix = { fg = "${blue}" },
+		TelescopePrompt = { link = "TelescopeNormal" },
+		TelescopePromptTitle = { fg = "${bg}", bg = "${blue}" },
+		TelescopePromptCounter = { fg = "${blue}" },
 		-- markdown
 		TSTitle = { fg = "${blue}" },
 		TSStrong = { fg = "${blue}" },
@@ -499,7 +511,7 @@ onedarkpro.setup({
 		TSPunctDelimiter = { fg = "${yellow}" },
 		TSPunctSpecial = { fg = "${yellow}" },
 		-- indentline
-		IndentBlanklineIndent1 = { fg = "#494949" },
+		IndentBlanklineIndent1 = { fg = "#4a4a4a" },
 		IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent4 = { link = "IndentBlanklineIndent1" },
@@ -537,8 +549,10 @@ onedarkpro.load()
 --
 require("telescope").setup({
 	defaults = {
-		prompt_prefix = " ",
+		prompt_prefix = " ",
 		selection_caret = " ",
+		border = true,
+		border_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
 		preview_width = 0.8,
 		layout_config = {
 			prompt_position = "top",
@@ -681,16 +695,29 @@ map("n", "<LEADER>9", [[<cmd>BufferLineGoToBuffer 9<CR>]], opt)
 -- #comment
 --
 require("Comment").setup({
+	---Add a space b/w comment and the line
+	---@type boolean|fun():boolean
+	padding = true,
+
+	---Whether the cursor should stay at its position
+	---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
+	---@type boolean
+	sticky = true,
+
+	---Lines to be ignored while comment/uncomment.
+	---Could be a regex string or a function that returns a regex string.
+	---Example: Use '^$' to ignore empty lines
+	---@type string|fun():string
+	ignore = "^$",
+
 	toggler = {
 		---Line-comment toggle keymap
 		line = "<LEADER>C",
-		-- ---Block-comment toggle keymap
-		-- block = '<LEADER>bc',
 	},
 	opleader = {
 		---Line-comment keymap
 		line = "<LEADER>cc",
-		-- ---Block-comment keymap
+		---Block-comment keymap
 		block = "<LEADER>cb",
 	},
 	extra = {
@@ -863,12 +890,9 @@ require("nvim-tree").setup({
 	ignore_ft_on_setup = {},
 	update_cwd = true,
 	sort_by = "name",
-	update_to_buf_dir = {
-		enable = true,
-		auto_open = true,
-	},
 	diagnostics = {
 		enable = true,
+		show_on_dirs = false,
 		icons = {
 			hint = "",
 			info = "",
@@ -886,7 +910,7 @@ require("nvim-tree").setup({
 		args = {},
 	},
 	filters = {
-		dotfies = false,
+		dotfiles = false,
 		custom = { ".git", ".DS_Store" },
 	},
 	git = {
@@ -899,7 +923,9 @@ require("nvim-tree").setup({
 		height = 30,
 		hide_root_folder = false,
 		side = "left",
-		auto_resize = false,
+		number = false,
+		relativenumber = false,
+		signcolumn = "yes",
 		mappings = {
 			custom_only = true,
 			list = {
@@ -934,14 +960,44 @@ require("nvim-tree").setup({
 				{ key = "q", action = "close" },
 				{ key = "?", action = "toggle_help" },
 			},
-			number = false,
-			relativenumber = false,
-			signcolumn = "yes",
 		},
-		trash = {
-			cmd = "trash",
-			require_confirm = true,
+	},
+	renderer = {
+		indent_markers = {
+			enable = false,
+			icons = {
+				corner = "└ ",
+				edge = "│ ",
+				none = "  ",
+			},
 		},
+		icons = {
+			webdev_colors = true,
+		},
+	},
+	actions = {
+		use_system_clipboard = true,
+		change_dir = {
+			enable = true,
+			global = false,
+			restrict_above_cwd = false,
+		},
+		open_file = {
+			quit_on_open = false,
+			resize_window = false,
+			window_picker = {
+				enable = true,
+				chars = "abcdefghijklmnopqrstuvwxyz1234567890",
+				exclude = {
+					filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
+					buftype = { "nofile", "terminal", "help" },
+				},
+			},
+		},
+	},
+	trash = {
+		cmd = "trash",
+		require_confirm = true,
 	},
 })
 map("n", "<C-e>", [[<cmd>NvimTreeToggle<CR>]], opt)
@@ -1097,6 +1153,11 @@ map("n", "<C-t>", [[<cmd>lua require("FTerm").toggle()<CR>]], opt)
 map("t", "<C-t>", [[<C-n><cmd>lua require("FTerm").toggle()<CR>]], opt)
 
 --
+-- #registers
+--
+vim.g.registers_window_border = "single"
+
+--
 -- #hlslens
 --
 map("n", "*", [[*<cmd>lua require('hlslens').start()<CR>]], opt)
@@ -1108,6 +1169,7 @@ map("n", "#", [[#<cmd>lua require('hlslens').start()<CR>]], opt)
 vim.g.default_im = "com.apple.keylayout.ABC"
 local function getIm()
 	local t = io.popen("im-select")
+	---@diagnostic disable-next-line: need-check-nil
 	return t:read("*all")
 end
 
@@ -1251,7 +1313,7 @@ end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
-capabilities.textDocument.completion.completionItem.snippetSupport = true
+-- capabilities.textDocument.completion.completionItem.snippetSupport = false
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
 local servers = {
