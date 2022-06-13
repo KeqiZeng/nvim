@@ -1168,7 +1168,7 @@ map("n", "#", [[#<cmd>lua require('hlslens').start()<CR>]], opt)
 --
 vim.g.default_im = "com.apple.keylayout.ABC"
 local function getIm()
-	local t = io.popen("im-select")
+	local t = io.popen("macism")
 	---@diagnostic disable-next-line: need-check-nil
 	return t:read("*all")
 end
@@ -1178,7 +1178,7 @@ function InsertL()
 	if vim.b.im == vim.g.default_im then
 		return 1
 	end
-	os.execute("im-select " .. vim.g.default_im)
+	os.execute("macism " .. vim.g.default_im)
 end
 
 function InsertE()
@@ -1187,7 +1187,7 @@ function InsertE()
 	elseif vim.b.im == nil then
 		vim.b.im = vim.g.default_im
 	end
-	os.execute("im-select " .. vim.b.im)
+	os.execute("macism " .. vim.b.im)
 end
 
 vim.cmd([[autocmd InsertLeave * :silent lua InsertL()]])
@@ -1313,7 +1313,7 @@ end
 
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
--- capabilities.textDocument.completion.completionItem.snippetSupport = false
+capabilities.textDocument.completion.completionItem.snippetSupport = false
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
 local servers = {
@@ -1340,6 +1340,21 @@ for _, lsp in ipairs(servers) do
 		single_file_support = true,
 	})
 end
+
+-- require("lspconfig").clangd.setup({
+-- 	on_attach = on_attach,
+-- 	capabilities = {
+-- 		textDocument = {
+-- 			completion = {
+-- 				completionItem = {
+-- 					snippetSupport = false,
+-- 				},
+-- 			},
+-- 		},
+-- 	},
+-- 	handlers = handlers,
+-- 	single_file_support = true,
+-- })
 
 require("lspconfig").texlab.setup({
 	on_attach = on_attach,
