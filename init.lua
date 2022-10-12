@@ -25,9 +25,9 @@ vim.cmd([[
 -- 代码缩进和折叠
 vim.cmd([[
 	set noexpandtab
-	set tabstop=4
-	set shiftwidth=4
-	set softtabstop=4
+	set tabstop=2
+	set shiftwidth=2
+	set softtabstop=2
 	set autoindent
 	set smarttab
 	set foldenable
@@ -91,6 +91,18 @@ map("n", "<LEADER><RIGHT>", [[<cmd>vertical resize +5<CR>]], opt)
 -- scroll in terminal
 map("t", "<DOWN>", [[<C-\><C-N>j]], opt)
 map("t", "<UP>", [[<C-\><C-N>k]], opt)
+
+function SaveAndReload()
+	vim.api.nvim_exec(
+		[[
+		w
+		e
+		]],
+		false
+	)
+end
+
+map("n", "<LEADER>r", [[<cmd>lua SaveAndReload()<CR>]], opt)
 
 function DeletAllBuffers()
 	vim.api.nvim_exec(
@@ -246,12 +258,25 @@ require("packer").startup(function()
 		end,
 	})
 	-- Registers
-	use("tversteeg/registers.nvim")
+	use({
+		"tversteeg/registers.nvim",
+		config = function()
+			require("registers").setup({
+				window = {
+					border = "single",
+				},
+			})
+		end,
+	})
 	-- Hlslens
 	use("kevinhwang91/nvim-hlslens")
 
 	-- LSP
 	use("neovim/nvim-lspconfig") -- Collection of configurations for built-in LSP client
+	use({
+		"williamboman/mason.nvim",
+		"williamboman/mason-lspconfig.nvim",
+	})
 	use("onsails/lspkind-nvim")
 	use("ray-x/lsp_signature.nvim")
 	use("kosayoda/nvim-lightbulb")
@@ -449,19 +474,15 @@ require("lualine").setup({
 --
 local onedarkpro = require("onedarkpro")
 onedarkpro.setup({
-	-- Theme can be overwritten with 'onedark' or 'onelight' as a string!
-	theme = function()
-		if vim.o.background == "dark" then
-			return "onedark"
-		else
-			return "onelight"
-		end
-	end,
+	dark_theme = "onedark", -- The default dark theme
+	light_theme = "onelight", -- The default light theme
+	caching = false, -- Use caching for the theme?
+	cache_path = vim.fn.expand(vim.fn.stdpath("cache") .. "/onedarkpro/"), -- The path to the cache directory
 	colors = {
 		onedark = {
 			bg = "#2e2e2e",
 			bg_statusline = "#3a3a3a",
-			fg_gutter = "#4a4a4a",
+			fg_gutter = "#4c4c4c",
 			fg = "#e9e9e9",
 			red = "#f15e64",
 			orange = "#e88854",
@@ -477,7 +498,7 @@ onedarkpro.setup({
 			highlight = "#f5d08b",
 		},
 	}, -- Override default colors. Can specify colors for "onelight" or "onedark" themes by passing in a table
-	hlgroups = {
+	highlights = {
 		Operator = { fg = "${blue}" },
 		Identifier = { link = "Operator" },
 		Constant = { link = "Operator" },
@@ -499,19 +520,20 @@ onedarkpro.setup({
 		TelescopePromptTitle = { fg = "${bg}", bg = "${blue}" },
 		TelescopePromptCounter = { fg = "${blue}" },
 		-- markdown
-		TSTitle = { fg = "${blue}" },
-		TSStrong = { fg = "${blue}" },
-		TSEmphasis = { fg = "${green}" },
-		TSTextReference = { fg = "${purple}" },
-		TSStrike = { fg = "${orange}" },
-		TSUnderline = { fg = "${purple}" },
-		TSURI = { fg = "${orange}" },
-		TSLiteral = { fg = "${pink}" },
-		TSMath = { fg = "${pink}" },
-		TSPunctDelimiter = { fg = "${yellow}" },
-		TSPunctSpecial = { fg = "${yellow}" },
+		Title = { fg = "${green}" },
+		htmlBold = { fg = "${blue}" },
+		htmlItalic = { fg = "${orange}" },
+		Statement = { fg = "${purple}" },
+		Type = { fg = "${yellow}" },
+		Typedef = { fg = "${yellow}" },
+		htmlUnderline = { fg = "${pink}" },
+		Underlined = { fg = "${pink}" },
+		markdownLink = { fg = "${purple}" },
+		Float = { fg = "${purple}" },
+		markdownCode = { fg = "${pink}" },
+		PreProc = { fg = "${yellow}" },
 		-- indentline
-		IndentBlanklineIndent1 = { fg = "#4a4a4a" },
+		IndentBlanklineIndent1 = { fg = "#4c4c4c" },
 		IndentBlanklineIndent2 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent3 = { link = "IndentBlanklineIndent1" },
 		IndentBlanklineIndent4 = { link = "IndentBlanklineIndent1" },
@@ -526,10 +548,11 @@ onedarkpro.setup({
 	},
 	styles = {
 		strings = "NONE", -- Style that is applied to strings
-		-- comments = "italic", -- Style that is applied to comments
+		comments = "italic", -- Style that is applied to comments
 		keywords = "NONE", -- Style that is applied to keywords
 		functions = "bold", -- Style that is applied to functions
 		variables = "NONE", -- Style that is applied to variables
+		virtual_text = "italic", -- Style that is applied to virtual text
 	},
 	options = {
 		bold = true, -- Use the themes opinionated bold styles?
@@ -598,13 +621,16 @@ map("n", "<C-f>", [[<cmd>lua require('telescope.builtin').treesitter()<CR>]], op
 --
 require("bufferline").setup({
 	options = {
-		numbers = function(opts)
-			return string.format("%s|%s.)", opts.id, opts.raise(opts.ordinal))
-		end,
-		-- NOTE: this plugin is designedwith this icon in mind,
-		-- and so changing this is NOT recommended, this is intended
-		-- as an escape hatch for people who cannot bear it for whatever reason
-		indicator_icon = "▎",
+		mode = "buffers", -- set to "tabs" to only show tabpages instead
+		numbers = "buffer_id", --"none" | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string
+		close_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+		right_mouse_command = "bdelete! %d", -- can be a string | function, see "Mouse actions"
+		left_mouse_command = "buffer %d", -- can be a string | function, see "Mouse actions"
+		middle_mouse_command = nil, -- can be a string | function, see "Mouse actions"
+		indicator = {
+			icon = "▎", -- this should be omitted if indicator style is not 'icon'
+			style = "icon", -- 'icon' | 'underline' | 'none'
+		},
 		buffer_close_icon = "",
 		modified_icon = "●",
 		close_icon = "",
@@ -614,67 +640,93 @@ require("bufferline").setup({
 		--- Please note some names can/will break the
 		--- bufferline so use this at your discretion knowing that it has
 		--- some limitations that will *NOT* be fixed.
-		name_formatter = function(buf) -- buf contains a "name", "path" and "bufnr"
-			-- remove extension from markdown files for example
-			if buf.name:match("%.md") then
-				return vim.fn.fnamemodify(buf.name, ":t:r")
-			end
+		name_formatter = function(name) -- buf contains:
+			-- name                | str        | the basename of the active file
+			-- path                | str        | the full path of the active file
+			-- bufnr (buffer only) | int        | the number of the active buffer
+			-- buffers (tabs only) | table(int) | the numbers of the buffers in the tab
+			-- tabnr (tabs only)   | int        | the "handle" of the tab, can be converted to its ordinal number using: `vim.api.nvim_tabpage_get_number(buf.tabnr)`
 		end,
 		max_name_length = 18,
 		max_prefix_length = 15, -- prefix used when a buffer is de-duplicated
+		truncate_names = true, -- whether or not tab names should be truncated
 		tab_size = 18,
-		diagnostics = "nvim_lsp",
+		diagnostics = "nvim_lsp", -- false | "nvim_lsp" | "coc",
 		diagnostics_update_in_insert = false,
+		-- The diagnostics indicator can be set to nil to keep the buffer name highlight but delete the highlighting
 		diagnostics_indicator = function(count, level)
 			return "(" .. count .. ") (" .. level .. ")"
 		end,
 		-- NOTE: this will be called a lot so don't do any heavy processing here
-		custom_filter = function(buf_number)
+		custom_filter = function(buf_number, buf_numbers)
+			-- filter out filetypes you don't want to see
+			-- if vim.bo[buf_number].filetype ~= "<i-dont-want-to-see-this>" then
+			--     return true
+			-- end
 			-- filter out by buffer name
 			if vim.fn.bufname(buf_number) ~= "alpha" or "NvimTree" then
 				return true
 			end
+			-- filter out based on arbitrary rules
+			-- e.g. filter out vim wiki buffer from tabline in your work repo
+			-- if vim.fn.getcwd() == "<work-repo>" and vim.bo[buf_number].filetype ~= "wiki" then
+			--     return true
+			-- end
+			-- filter out by it's index number in list (don't show first buffer)
+			if buf_numbers[1] ~= buf_number then
+				return true
+			end
 		end,
-		offsets = { { filetype = "NvimTree", text = "File Explorer", text_align = "center" } },
+		offsets = {
+			{
+				filetype = "NvimTree",
+				text = "File Explorer",
+				text_align = "center", -- "left" | "center" | "right"
+				separator = true,
+			},
+		},
+		color_icons = true, -- whether or not to add the filetype icon highlights
 		show_buffer_icons = true, -- disable filetype icons for buffers
 		show_buffer_close_icons = false,
+		show_buffer_default_icon = true, -- whether or not an unrecognised filetype should show a default icon
 		show_close_icon = false,
 		show_tab_indicators = true,
+		show_duplicate_prefix = true, -- whether to show duplicate buffer prefix
 		persist_buffer_sort = true, -- whether or not custom sorted buffers should persist
 		-- can also be a table containing 2 custom separators
 		-- [focused and unfocused]. eg: { '|', '|' }
-		separator_style = "thick",
+		separator_style = "thick", -- "slant" | "thick" | "thin" | { "any", "any" },
 		enforce_regular_tabs = false,
 		always_show_bufferline = false,
-		sort_by = "extension",
-	},
-
-	custom_areas = {
-		right = function()
-			local result = {}
-			local seve = vim.diagnostic.severity
-			local error = #vim.diagnostic.get(0, { severity = seve.ERROR })
-			local warning = #vim.diagnostic.get(0, { severity = seve.WARN })
-			local info = #vim.diagnostic.get(0, { severity = seve.INFO })
-			local hint = #vim.diagnostic.get(0, { severity = seve.HINT })
-
-			if error ~= 0 then
-				table.insert(result, { text = "  " .. error, guifg = "#f15e64" })
-			end
-
-			if warning ~= 0 then
-				table.insert(result, { text = "  " .. warning, guifg = "#e5c07b" })
-			end
-
-			if hint ~= 0 then
-				table.insert(result, { text = "  " .. hint, guifg = "#98c378" })
-			end
-
-			if info ~= 0 then
-				table.insert(result, { text = "  " .. info, guifg = "#e88854" })
-			end
-			return result
-		end,
+		hover = {
+			enabled = true,
+			delay = 200,
+			reveal = { "close" },
+		},
+		sort_by = "extensions",
+		custom_areas = {
+			right = function()
+				local result = {}
+				local seve = vim.diagnostic.severity
+				local error = #vim.diagnostic.get(0, { severity = seve.ERROR })
+				local warning = #vim.diagnostic.get(0, { severity = seve.WARN })
+				local info = #vim.diagnostic.get(0, { severity = seve.INFO })
+				local hint = #vim.diagnostic.get(0, { severity = seve.HINT })
+				if error ~= 0 then
+					table.insert(result, { text = "  " .. error, guifg = "#f15e64" })
+				end
+				if warning ~= 0 then
+					table.insert(result, { text = "  " .. warning, guifg = "#e5c07b" })
+				end
+				if hint ~= 0 then
+					table.insert(result, { text = "  " .. hint, guifg = "#98c378" })
+				end
+				if info ~= 0 then
+					table.insert(result, { text = "  " .. info, guifg = "#e88854" })
+				end
+				return result
+			end,
+		},
 	},
 })
 
@@ -767,21 +819,21 @@ require("indent_blankline").setup({
 		"IndentBlanklineIndent5",
 		"IndentBlanklineIndent6",
 	},
-	filetype_exclude = { "lspinfo", "packer", "checkhealth", "help", "alpha", "NvimTree" },
+	filetype_exclude = { "lspinfo", "packer", "checkhealth", "help", "alpha", "NvimTree", "mason" },
 	buftype_exclude = { "terminal" },
 })
 
 --
 -- #treesitter
 --
-local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-parser_config.markdown = {
-	install_info = {
-		url = "~/OpenSouce/tree-sitter-markdown",
-		files = { "src/parser.c", "src/scanner.cc" },
-	},
-	filetype = "markdown",
-}
+-- local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+-- parser_config.markdown = {
+-- 	install_info = {
+-- 		url = "~/OpenSouce/tree-sitter-markdown",
+-- 		files = { "src/parser.c", "src/scanner.cc" },
+-- 	},
+-- 	filetype = "markdown",
+-- }
 
 require("nvim-treesitter.configs").setup({
 	-- One of "all", "maintained" (parsers with maintainers), or a list of languages
@@ -793,8 +845,10 @@ require("nvim-treesitter.configs").setup({
 		"lua",
 		"go",
 		"gomod",
+		"java",
 		"python",
 		"markdown",
+		"markdown_inline",
 		"html",
 		"bash",
 		"latex",
@@ -806,7 +860,7 @@ require("nvim-treesitter.configs").setup({
 	},
 
 	-- Install languages synchronously (only applied to `ensure_installed`)
-	sync_install = false,
+	sync_install = true,
 
 	-- List of parsers to ignore installing
 
@@ -881,54 +935,42 @@ require("nvim-treesitter.configs").setup({
 --
 -- #nvim-tree
 --
-require("nvim-tree").setup({
+require("nvim-tree").setup({ -- BEGIN_DEFAULT_OPTS
+	auto_reload_on_write = true,
+	create_in_closed_folder = false,
 	disable_netrw = true,
-	hijack_netrw = true,
 	hijack_cursor = false,
+	hijack_netrw = true,
+	hijack_unnamed_buffer_when_opening = false,
+	ignore_buffer_on_setup = false,
 	open_on_setup = false,
+	open_on_setup_file = false,
 	open_on_tab = false,
-	ignore_ft_on_setup = {},
-	update_cwd = true,
+	focus_empty_on_setup = false,
+	ignore_buf_on_tab_change = {},
 	sort_by = "name",
-	diagnostics = {
-		enable = true,
-		show_on_dirs = false,
-		icons = {
-			hint = "",
-			info = "",
-			warning = "",
-			error = "",
-		},
-	},
-	update_focused_file = {
-		enable = false,
-		update_cwd = false,
-		ignore_list = {},
-	},
-	system_open = {
-		cmd = nil,
-		args = {},
-	},
-	filters = {
-		dotfiles = false,
-		custom = { ".git", ".DS_Store" },
-	},
-	git = {
-		enable = true,
-		ignore = true,
-		timeout = 500,
-	},
+	root_dirs = {},
+	prefer_startup_root = false,
+	sync_root_with_cwd = false,
+	reload_on_bufenter = false,
+	respect_buf_cwd = false,
+	on_attach = "disable",
+	remove_keymaps = false,
+	select_prompts = false,
 	view = {
-		width = 36,
-		height = 30,
+		adaptive_size = false,
+		centralize_selection = false,
+		width = 30,
 		hide_root_folder = false,
 		side = "left",
+		preserve_window_proportions = false,
 		number = false,
 		relativenumber = false,
 		signcolumn = "yes",
 		mappings = {
 			custom_only = true,
 			list = {
+				-- user mappings go here
 				{ key = { "<CR>", "o" }, action = "edit" },
 				{ key = "<C-]>", action = "cd" },
 				{ key = "<C-v>", action = "vsplit" },
@@ -961,19 +1003,116 @@ require("nvim-tree").setup({
 				{ key = "?", action = "toggle_help" },
 			},
 		},
+		float = {
+			enable = false,
+			quit_on_focus_loss = true,
+			open_win_config = {
+				relative = "editor",
+				border = "rounded",
+				width = 30,
+				height = 30,
+				row = 1,
+				col = 1,
+			},
+		},
 	},
 	renderer = {
+		add_trailing = false,
+		group_empty = false,
+		highlight_git = false,
+		full_name = false,
+		highlight_opened_files = "none",
+		root_folder_modifier = ":~",
+		indent_width = 2,
 		indent_markers = {
 			enable = false,
+			inline_arrows = true,
 			icons = {
-				corner = "└ ",
-				edge = "│ ",
-				none = "  ",
+				corner = "└",
+				edge = "│",
+				item = "│",
+				bottom = "─",
+				none = " ",
 			},
 		},
 		icons = {
 			webdev_colors = true,
+			git_placement = "before",
+			padding = " ",
+			symlink_arrow = " ➛ ",
+			show = {
+				file = true,
+				folder = true,
+				folder_arrow = true,
+				git = true,
+			},
+			glyphs = {
+				default = "",
+				symlink = "",
+				bookmark = "",
+				folder = {
+					arrow_closed = "",
+					arrow_open = "",
+					default = "",
+					open = "",
+					empty = "",
+					empty_open = "",
+					symlink = "",
+					symlink_open = "",
+				},
+				git = {
+					unstaged = "✗",
+					staged = "✓",
+					unmerged = "",
+					renamed = "➜",
+					untracked = "★",
+					deleted = "",
+					ignored = "◌",
+				},
+			},
 		},
+		special_files = { "Cargo.toml", "Makefile", "README.md", "readme.md" },
+		symlink_destination = true,
+	},
+	hijack_directories = {
+		enable = true,
+		auto_open = true,
+	},
+	update_focused_file = {
+		enable = false,
+		update_root = false,
+		ignore_list = {},
+	},
+	ignore_ft_on_setup = {},
+	system_open = {
+		cmd = "",
+		args = {},
+	},
+	diagnostics = {
+		enable = true,
+		show_on_dirs = true,
+		debounce_delay = 50,
+		icons = {
+			hint = "",
+			info = "",
+			warning = "",
+			error = "",
+		},
+	},
+	filters = {
+		dotfiles = true,
+		custom = {},
+		exclude = { ".git", ".DS_Store" },
+	},
+	filesystem_watchers = {
+		enable = true,
+		debounce_delay = 50,
+	},
+	git = {
+		enable = true,
+		ignore = true,
+		show_on_dirs = true,
+		timeout = 400,
 	},
 	actions = {
 		use_system_clipboard = true,
@@ -982,24 +1121,59 @@ require("nvim-tree").setup({
 			global = false,
 			restrict_above_cwd = false,
 		},
+		expand_all = {
+			max_folder_discovery = 300,
+			exclude = {},
+		},
+		file_popup = {
+			open_win_config = {
+				col = 1,
+				row = 1,
+				relative = "cursor",
+				border = "shadow",
+				style = "minimal",
+			},
+		},
 		open_file = {
 			quit_on_open = false,
-			resize_window = false,
+			resize_window = true,
 			window_picker = {
 				enable = true,
-				chars = "abcdefghijklmnopqrstuvwxyz1234567890",
+				chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
 				exclude = {
 					filetype = { "notify", "packer", "qf", "diff", "fugitive", "fugitiveblame" },
 					buftype = { "nofile", "terminal", "help" },
 				},
 			},
 		},
+		remove_file = {
+			close_window = true,
+		},
 	},
 	trash = {
 		cmd = "trash",
 		require_confirm = true,
 	},
-})
+	live_filter = {
+		prefix = "[FILTER]: ",
+		always_show_folders = true,
+	},
+	log = {
+		enable = false,
+		truncate = false,
+		types = {
+			all = false,
+			config = false,
+			copy_paste = false,
+			dev = false,
+			diagnostics = false,
+			git = false,
+			profile = false,
+			watcher = false,
+		},
+	},
+}) -- END_DEFAULT_OPTS
+
 map("n", "<C-e>", [[<cmd>NvimTreeToggle<CR>]], opt)
 
 --
@@ -1153,11 +1327,6 @@ map("n", "<C-t>", [[<cmd>lua require("FTerm").toggle()<CR>]], opt)
 map("t", "<C-t>", [[<C-n><cmd>lua require("FTerm").toggle()<CR>]], opt)
 
 --
--- #registers
---
-vim.g.registers_window_border = "single"
-
---
 -- #hlslens
 --
 map("n", "*", [[*<cmd>lua require('hlslens').start()<CR>]], opt)
@@ -1192,6 +1361,34 @@ end
 
 vim.cmd([[autocmd InsertLeave * :silent lua InsertL()]])
 vim.cmd([[autocmd InsertEnter * :silent lua InsertE()]])
+
+--
+-- #mason
+--
+require("mason").setup({
+	ui = {
+		icons = {
+			package_installed = "✓",
+			package_pending = "➜",
+			package_uninstalled = "✗",
+		},
+		border = {
+			{ "╭", "FloatBorder" },
+			{ "─", "FloatBorder" },
+			{ "╮", "FloatBorder" },
+			{ "│", "FloatBorder" },
+			{ "╯", "FloatBorder" },
+			{ "─", "FloatBorder" },
+			{ "╰", "FloatBorder" },
+			{ "│", "FloatBorder" },
+		},
+	},
+})
+
+require("mason-lspconfig").setup({
+	-- ensure_installed = { "sumneko_lua", "rust_analyzer" }
+	ensure_installed = { "jdtls" },
+})
 
 --
 -- #lspconfig
@@ -1239,7 +1436,6 @@ map("n", "J", [[<cmd>lua vim.diagnostic.open_float(nil, {focus=false})<CR>]], op
 map("n", "[d", [[<cmd>lua vim.diagnostic.goto_prev()<CR>]], opt)
 map("n", "]d", [[<cmd>lua vim.diagnostic.goto_next()<CR>]], opt)
 
-local lspconfig = require("lspconfig")
 local on_attach = function(_, bufnr)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", [[<cmd>lua vim.lsp.buf.definition()<CR>]], opt)
 	vim.api.nvim_buf_set_keymap(bufnr, "n", "gD", [[<cmd>lua vim.lsp.buf.declaration()<CR>]], opt)
@@ -1265,6 +1461,13 @@ local on_attach = function(_, bufnr)
         augroup GolangFormatting
             autocmd!
             autocmd BufWritePost *.go silent !gofmt -w %
+        augroup END
+        ]])
+
+	vim.cmd([[
+        augroup JavaFormatting
+            autocmd!
+            autocmd BufWritePost *.java silent !java -jar /Library/Java/google-java-format-1.15.0-all-deps.jar --replace %
         augroup END
         ]])
 
@@ -1311,6 +1514,7 @@ local on_attach = function(_, bufnr)
         ]])
 end
 
+local lspconfig = require("lspconfig")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
 capabilities.textDocument.completion.completionItem.snippetSupport = false
@@ -1325,6 +1529,7 @@ local servers = {
 	"eslint",
 	"gopls",
 	"html",
+	"jdtls",
 	"jsonls",
 	"sumneko_lua",
 	"pyright",
@@ -1332,6 +1537,9 @@ local servers = {
 	"rust_analyzer",
 	-- "texlab",
 }
+
+local util = require("lspconfig.util")
+
 for _, lsp in ipairs(servers) do
 	lspconfig[lsp].setup({
 		on_attach = on_attach,
@@ -1341,20 +1549,13 @@ for _, lsp in ipairs(servers) do
 	})
 end
 
--- require("lspconfig").clangd.setup({
--- 	on_attach = on_attach,
--- 	capabilities = {
--- 		textDocument = {
--- 			completion = {
--- 				completionItem = {
--- 					snippetSupport = false,
--- 				},
--- 			},
--- 		},
--- 	},
--- 	handlers = handlers,
--- 	single_file_support = true,
--- })
+require("lspconfig").jdtls.setup({
+	on_attach = on_attach,
+	capabilities = capabilities,
+	handlers = handlers,
+	root_dir = util.root_pattern(".git", "build.xml", "pom.xml", "settings.gradle", "settings.gradle.kts"),
+	single_file_support = true,
+})
 
 require("lspconfig").texlab.setup({
 	on_attach = on_attach,
@@ -1474,7 +1675,13 @@ cmp.setup({
 		end,
 	},
 	sources = {
-		{ name = "nvim_lsp", priority = 99 },
+		{
+			name = "nvim_lsp",
+			priority = 99,
+			entry_filter = function(entry)
+				return require("cmp").lsp.CompletionItemKind.Snippet ~= entry:get_kind()
+			end,
+		},
 		{ name = "luasnip", priority = 90 },
 		{ name = "nvim_lua", priority = 50 },
 		{ name = "buffer", priority = 10 },
@@ -1576,7 +1783,7 @@ require("cmp_dictionary").setup({
 --
 -- #mkdp
 --
-map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
+-- map("n", "<LEADER>p", [[<cmd>MarkdownPreviewToggle<CR>]], opt)
 
 --
 -- #golang
@@ -1593,6 +1800,7 @@ vim.cmd([[
 	augroup Goimports
 		autocmd!
 		autocmd FileType go command! Goimport silent !goimports -w %
+		autocmd FileType go noremap <LEADER>i :Goimport<CR>
 	augroup END
 ]])
 
@@ -1601,8 +1809,9 @@ vim.cmd([[
 --
 vim.cmd([[
 	augroup Latexmk
-	autocmd!
-	autocmd FileType tex noremap <LEADER>ll :TexlabBuild<CR> | noremap <LEADER>lv :TexlabForward<CR> | noremap <LEADER>lc :silent !latexmk -c %<CR>:echo "latexmk: clean up!"<CR>
+		autocmd!
+		autocmd FileType tex noremap <LEADER>ll :TexlabBuild<CR> | noremap <LEADER>lv :TexlabForward<CR> | noremap <LEADER>lc :silent !latexmk -c %<CR>:echo "latexmk: clean up!"<CR>
+	augroup END
 ]])
 
 --
@@ -1621,7 +1830,8 @@ function SaveAndRunCode()
 		[[
 		w
 		RunCode
-	]],
+		silent! MarkdownPreviewToggle
+]],
 		false
 	)
 end

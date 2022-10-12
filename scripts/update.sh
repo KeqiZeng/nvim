@@ -10,17 +10,8 @@ npm update -g neovim
 sudo gem update neovim
 
 # Language-Server
-npm update -g bash-language-server              #bash
-npm update -g dockerfile-language-server-nodejs #dockerls
-npm update -g vscode-langservers-extracted      #cssls(for css), eslint(for javascript), html and json
-npm update -g remark-language-server            #remarkls for markdown
 npm update remark
-
-pip install --upgrade cmake-language-server #cmake
-
-go install golang.org/x/tools/gopls@latest #golang
-
-brew upgrade lua-language-server pyright texlab #luals, pyright and texlab
+brew upgrade texlab #lua python and latex
 
 # for installation of Markdown-preview
 npm update -g yarn

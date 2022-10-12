@@ -4,5 +4,6 @@
   "cpp": "cd $dir && clang++ -std=c++20 $fileName -Wall -o $fileNameWithoutExt && ./$fileNameWithoutExt",
   "rust": "cargo run",
   "go": "go run .",
-  "python": "python"
+  "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+  "python": "python -u"
 }
