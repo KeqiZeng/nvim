@@ -221,7 +221,12 @@ require("packer").startup(function()
 	-- Rainbow
 	use("p00f/nvim-ts-rainbow")
 	-- Numb
-	use({ "nacro90/numb.nvim", require("numb").setup() })
+	use({
+		"nacro90/numb.nvim",
+		config = function()
+			require("numb").setup()
+		end,
+	})
 	-- Matchup
 	use({
 		"andymass/vim-matchup",
@@ -232,14 +237,23 @@ require("packer").startup(function()
 	})
 	-- Surround
 	use({
-		"ur4ltz/surround.nvim",
+		"kylechui/nvim-surround",
+		tag = "*", -- Use for stability; omit to use `main` branch for the latest features
 		config = function()
-			require("surround").setup({
-				mappings_style = "sandwich",
-				map_insert_mode = false,
+			require("nvim-surround").setup({
+				-- Configuration here, or leave empty to use defaults
 			})
 		end,
 	})
+	-- use({
+	-- 	"ur4ltz/surround.nvim",
+	-- 	config = function()
+	-- 		require("surround").setup({
+	-- 			mappings_style = "sandwich",
+	-- 			map_insert_mode = false,
+	-- 		})
+	-- 	end,
+	-- })
 	-- Visual_multi
 	use("mg979/vim-visual-multi")
 	-- Accelerated-jk
@@ -303,7 +317,13 @@ require("packer").startup(function()
 
 	-- Language
 	-- markdown
-	use({ "iamcco/markdown-preview.nvim", ft = "markdown", run = "cd app && yarn install" })
+	use({
+		"iamcco/markdown-preview.nvim",
+		ft = "markdown",
+		run = function()
+			vim.fn["mkdp#util#install"]()
+		end,
+	})
 	-- Code_runner
 	use({ "CRAG666/code_runner.nvim", requires = "nvim-lua/plenary.nvim" })
 end)
@@ -431,7 +451,8 @@ gps.setup({
 require("lualine").setup({
 	options = {
 		icons_enabled = true,
-		theme = "onedarkpro",
+		-- theme = "onedarkpro",
+		theme = "onedark",
 		component_separators = "|",
 		section_separators = { " " },
 		disabled_filetypes = {},
@@ -474,8 +495,8 @@ require("lualine").setup({
 --
 local onedarkpro = require("onedarkpro")
 onedarkpro.setup({
-	dark_theme = "onedark", -- The default dark theme
-	light_theme = "onelight", -- The default light theme
+	-- dark_theme = "onedark", -- The default dark theme
+	-- light_theme = "onelight", -- The default light theme
 	caching = false, -- Use caching for the theme?
 	cache_path = vim.fn.expand(vim.fn.stdpath("cache") .. "/onedarkpro/"), -- The path to the cache directory
 	colors = {
@@ -541,7 +562,7 @@ onedarkpro.setup({
 		IndentBlanklineIndent6 = { link = "IndentBlanklineIndent1" },
 	}, -- Override default highlight groups
 	plugins = { -- Override which plugins highlight groups are loaded
-		native_lsp = true,
+		nvim_lsp = true,
 		polygot = false,
 		treesitter = true,
 		-- Others omitted for brevity
@@ -946,7 +967,7 @@ require("nvim-tree").setup({ -- BEGIN_DEFAULT_OPTS
 	open_on_setup = false,
 	open_on_setup_file = false,
 	open_on_tab = false,
-	focus_empty_on_setup = false,
+	-- focus_empty_on_setup = false,
 	ignore_buf_on_tab_change = {},
 	sort_by = "name",
 	root_dirs = {},
@@ -1329,6 +1350,7 @@ map("t", "<C-t>", [[<C-n><cmd>lua require("FTerm").toggle()<CR>]], opt)
 --
 -- #hlslens
 --
+require("hlslens").setup()
 map("n", "*", [[*<cmd>lua require('hlslens').start()<CR>]], opt)
 map("n", "#", [[#<cmd>lua require('hlslens').start()<CR>]], opt)
 
@@ -1386,8 +1408,7 @@ require("mason").setup({
 })
 
 require("mason-lspconfig").setup({
-	-- ensure_installed = { "sumneko_lua", "rust_analyzer" }
-	ensure_installed = { "jdtls" },
+	-- ensure_installed = { "jdtls" },
 })
 
 --
@@ -1516,8 +1537,8 @@ end
 
 local lspconfig = require("lspconfig")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
-capabilities.textDocument.completion.completionItem.snippetSupport = false
+capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+-- capabilities.textDocument.completion.completionItem.snippetSupport = false
 
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
 local servers = {
@@ -1529,9 +1550,9 @@ local servers = {
 	"eslint",
 	"gopls",
 	"html",
-	"jdtls",
+	-- "jdtls",
 	"jsonls",
-	"sumneko_lua",
+	"lua_ls",
 	"pyright",
 	"remark_ls",
 	"rust_analyzer",
@@ -1789,7 +1810,7 @@ require("cmp_dictionary").setup({
 -- #golang
 --
 vim.cmd([[
-	augroup GolangLint
+	augroup GoLint
 		autocmd!
 		autocmd FileType go command! GolintFile set splitbelow | :sp | res -3 | :term golangci-lint run %
 		autocmd FileType go command! GolintDir set splitbelow | :sp | res -3 | :term golangci-lint run
@@ -1799,8 +1820,18 @@ vim.cmd([[
 vim.cmd([[
 	augroup Goimports
 		autocmd!
-		autocmd FileType go command! Goimport silent !goimports -w %
-		autocmd FileType go noremap <LEADER>i :Goimport<CR>
+		autocmd FileType go command! Goimports silent !goimports -w %
+		autocmd FileType go noremap <LEADER>i :Goimports<CR>
+	augroup END
+]])
+
+--
+-- #cpp
+--
+vim.cmd([[
+	augroup CppLint
+		autocmd!
+		autocmd FileType cpp command! CppLint set splitbelow | :sp | res -3 | :term cpplint --quiet --linelength=120 %
 	augroup END
 ]])
 
@@ -1823,14 +1854,14 @@ require("code_runner").setup({
 		size = 15,
 	},
 	filetype_path = vim.fn.expand("~/.config/nvim/code_runner.json"),
-	project_path = vim.fn.expand("~/.config/nvim/projects_manager.json"),
+	-- project_path = vim.fn.expand("~/.config/nvim/projects_manager.json"),
 })
 function SaveAndRunCode()
 	vim.api.nvim_exec(
 		[[
 		w
 		RunCode
-		silent! MarkdownPreviewToggle
+		" silent! MarkdownPreviewToggle
 ]],
 		false
 	)

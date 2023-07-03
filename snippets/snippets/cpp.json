@@ -3,5 +3,20 @@
     "prefix": "main",
     "body": ["int main () {", "\t$1", "\treturn 0;", "}"],
     "description": "A simple main function for a C++ program"
+  },
+  "std::cin": {
+    "prefix": "cin",
+    "body": ["std::cin >> "],
+    "description": "Abbreviation for std::cin"
+  },
+  "std::cout": {
+    "prefix": "cout",
+    "body": ["std::cout << "],
+    "description": "Abbreviation for std::cout"
+  },
+  "std::endl": {
+    "prefix": "endl",
+    "body": ["std::endl;"],
+    "description": "Abbreviation for std::endl;"
   }
 }
