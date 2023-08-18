@@ -335,6 +335,16 @@ require("lazy").setup({
     event = { "UIEnter" },
   },
 
+  -- smartcolumn
+  {
+  "m4xshen/smartcolumn.nvim",
+    opts = {
+      colorcolumn = "100",
+      disabled_filetypes = { "help", "text", "markdown", "NvimTree", "lazy", "mason", "dashboard" },
+      scope = "file",
+    },
+  },
+
   -- numb
   {
     "nacro90/numb.nvim",
@@ -1946,11 +1956,6 @@ local lspconfig = require("lspconfig")
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-local handlers = {
-  -- ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
-  -- ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
-}
-
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
 local servers = {
   "bashls",
@@ -1972,17 +1977,13 @@ local servers = {
 local util = require("lspconfig.util")
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup({
-    on_attach = on_attach,
     capabilities = capabilities,
-    handlers = handlers,
     single_file_support = true,
   })
 end
 
 require("lspconfig").clangd.setup({
-  on_attach = on_attach,
   capabilities = capabilities,
-  handlers = handlers,
   filetypes = { "c", "cpp", "cc", "h", "hpp", "objc", "objcpp", "cuda", "proto" },
   root_dir = util.root_pattern(".clangd",
     ".clang-tidy",
@@ -1996,17 +1997,13 @@ require("lspconfig").clangd.setup({
 })
 
 require("lspconfig").jdtls.setup({
-  on_attach = on_attach,
   capabilities = capabilities,
-  handlers = handlers,
   root_dir = util.root_pattern(".git", "build.xml", "pom.xml", "settings.gradle", "settings.gradle.kts"),
   single_file_support = true,
 })
 
 require("lspconfig").texlab.setup({
-  on_attach = on_attach,
   capabilities = capabilities,
-  handlers = handlers,
   settings = {
     texlab = {
       auxDirectory = ".",
