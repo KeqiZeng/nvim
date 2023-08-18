@@ -1,9 +1,7 @@
-# Ketch's personal Nvimconf
+## Ketch's personal Nvimconf on MacOS
 
-Tired to open many files when change my config, so written all config in init.lua
+Autoswitchim requires ['macism'](https://github.com/laishulu/macism)(on Mac for Squirrel) (Linux: [`im-select`](https://github.com/daipeihust/im-select))
 
-Run setup.sh to install and update Language Server Protocol and Language Provider. On MacOS, I use clangd as LSP for c and cpp, which is included in Xcode-CommandLine-Tools, so need to run `xcode-select --install` to install it manually.
+Telescope requires `fd` and `ripgrep`
 
-Autoswitchim require ['macism'](https://github.com/laishulu/macism)(on Mac for Squirrel) [`im-select`](https://github.com/daipeihust/im-select)(for Linux)
-
-Two dictionaries(one for English, another for Deutsch) include in `dict` to support words completion.
+run `./setup.sh` to install requirements.
