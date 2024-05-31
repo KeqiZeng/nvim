@@ -1,23 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-cd ~ || return
-
-# Nvim
+# nvim
 brew install neovim
 
-# Provider
+# provider
 pip install neovim pynvim
-npm install -g neovim
-sudo gem install neovim
 
-# for installation of Markdown-preview
-npm install -g yarn
+# autoSwitchIm
+brew tap daipeihust/tap
+brew install im-select
 
-# for Treesitter.nvim
-brew install tree-sitter
-
-# for Telescope
+# telescope
 brew install ripgrep fd
 
-# for autoswitchim
-brew install macism
+# treesitter
+brew install tree-sitter
