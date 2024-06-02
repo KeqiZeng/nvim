@@ -216,14 +216,14 @@ end
 function InsertL()
 	vim.b.im = getIm()
 	if vim.b.im == vim.g.default_im then
-		return 1
+		return
 	end
 	os.execute("im-select " .. vim.g.default_im)
 end
 
 function InsertE()
 	if vim.b.im == vim.g.default_im then
-		return 1
+		return
 	elseif vim.b.im == nil then
 		vim.b.im = vim.g.default_im
 	end
@@ -232,6 +232,59 @@ end
 
 vim.cmd("autocmd InsertLeave * :silent lua InsertL()")
 vim.cmd("autocmd InsertEnter * :silent lua InsertE()")
+
+-----------------------------------
+--- #filetype specific settings ---
+-----------------------------------
+autocmd("FileType", {
+  group = augroup("python_settings"),
+  pattern = "python",
+  callback = function()
+    vim.bo.expandtab = true
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+    vim.bo.softtabstop = 4
+
+    local function getCondaEnvPaths()
+      local paths = {}
+
+      local handle = io.popen("conda env list")
+      if handle == nil then
+        print("Failed to get conda env list.")
+        return paths
+      end
+      local result = handle:read("*a")
+      handle:close()
+
+      for path in string.gmatch(result, "/[%w%p]+") do
+        table.insert(paths, path)
+      end
+
+      return paths
+    end
+
+    local function setPythonPath()
+      local envPaths = getCondaEnvPaths()
+      if envPaths == nil then
+        return
+      end
+      vim.ui.select(envPaths, {
+          prompt = "Select a Conda environment:",
+          format_item = function(item)
+              return item
+          end,
+      }, function(choice)
+          if choice then
+            local pythonPath = choice .. "/bin/python"
+            vim.cmd("PyrightSetPythonPath " .. pythonPath)
+            print("Python path set to: " .. pythonPath)
+          end
+      end)
+    end
+
+    vim.api.nvim_create_user_command("SetPythonPath", setPythonPath, {})
+  end,
+})
 
 ----------------
 --- #keymaps ---
@@ -404,7 +457,7 @@ require("lazy").setup({
 		},
 	},
 
-	-- codeium
+  -- codeium
 	{
 		"Exafunction/codeium.nvim",
 		event = "InsertEnter",
@@ -417,28 +470,28 @@ require("lazy").setup({
 		end,
 	},
 
-  -- outline
-  {
-    "hedyhli/outline.nvim",
-    lazy = true,
-    cmd = { "Outline", "OutlineOpen" },
-    keys = {
-      { "<leader>o", "<cmd>Outline<CR>", desc = "Toggle outline" },
-    },
-    opts = {
-      outline_window = {
-        position = 'left',
-      },
-      preview_window = {
-        border = "rounded",
-      },
-      keymaps = {
-        restore_location = '<C-r>',
-        hover_symbol = 'K',
-        toggle_preview = 'p',
-      }
-    },
-  },
+	-- outline
+	{
+		"hedyhli/outline.nvim",
+		lazy = true,
+		cmd = { "Outline", "OutlineOpen" },
+		keys = {
+			{ "<leader>o", "<cmd>Outline<CR>", desc = "Toggle outline" },
+		},
+		opts = {
+			outline_window = {
+				position = "left",
+			},
+			preview_window = {
+				border = "rounded",
+			},
+			keymaps = {
+				restore_location = "<C-r>",
+				hover_symbol = "K",
+				toggle_preview = "p",
+			},
+		},
+	},
 
 	-- lsp_signature
 	{
@@ -599,6 +652,14 @@ require("lazy").setup({
 		opts = {},
 	},
 
+	-- autopairs
+	{
+		"echasnovski/mini.pairs",
+		event = "InsertEnter",
+		version = "*",
+		opts = {},
+	},
+
 	-- indent
 	{
 		"echasnovski/mini.indentscope",
@@ -609,13 +670,25 @@ require("lazy").setup({
 		},
 	},
 
-	-- autopairs
-	{
-		"echasnovski/mini.pairs",
-		event = "InsertEnter",
-		version = "*",
-		opts = {},
-	},
+  -- smartcolumn
+  {
+    "m4xshen/smartcolumn.nvim",
+    event = "BufReadPost",
+    opts = {
+      colorcolumn = "100",
+      disabled_filetypes = { "help", "text", "markdown", "NvimTree", "lazy", "mason", "dashboard", "lspinfo", "noice" },
+      scope = "window",
+    },
+  },
+
+  -- -- indentmini
+  -- {
+  --   "nvimdev/indentmini.nvim",
+  --   event = "BufReadPost",
+  --   opts = {
+  --     exclude = { "markdown", "txt" }
+  --   }
+  -- },
 
 	-- rainbow
 	{
@@ -656,12 +729,12 @@ require("lazy").setup({
     },
 	},
 
-  -- undotree
-  {
-    "jiaoshijie/undotree",
-    dependencies = "nvim-lua/plenary.nvim",
-    event = "BufReadPost",
-  },
+	-- undotree
+	{
+		"jiaoshijie/undotree",
+		dependencies = "nvim-lua/plenary.nvim",
+		event = "BufReadPost",
+	},
 
 	-- whichkey
 	{
@@ -714,7 +787,7 @@ require("catppuccin").setup({
 		dashboard = true,
 		flash = true,
 		gitsigns = true,
-		indent_blankline = { enabled = true },
+		-- indent_blankline = { enabled = true },
 		markdown = true,
 		mason = true,
 		mini = true,
@@ -746,10 +819,10 @@ require("catppuccin").setup({
 vim.cmd.colorscheme("catppuccin")
 vim.api.nvim_set_hl(0, "visual", { reverse = true })
 
-local mocha = require("catppuccin.palettes").get_palette("mocha")
+local palette = require("catppuccin.palettes").get_palette("mocha")
 
-vim.cmd.highlight("IndentLine guifg=" .. mocha.surface1)
-vim.cmd.highlight("IndentLineCurrent guifg=" .. mocha.pink)
+-- vim.cmd.highlight("IndentLine guifg=" .. palette.surface1)
+-- vim.cmd.highlight("IndentLineCurrent guifg=" .. palette.pink)
 
 ------------------
 --- #dashboard ---
@@ -835,8 +908,8 @@ local lualine_config = {
 			-- We are going to use lualine_c an lualine_x as left and
 			-- right section. Both are highlighted by c theme .  So we
 			-- are just setting default looks o statusline
-			normal = { c = { fg = mocha.text, bg = mocha.surface1 } },
-			inactive = { c = { fg = mocha.text, bg = mocha.surface1 } },
+			normal = { c = { fg = palette.text, bg = palette.surface1 } },
+			inactive = { c = { fg = palette.text, bg = palette.surface1 } },
 		},
 	},
 	sections = {
@@ -874,7 +947,7 @@ ins_left({
 	function()
 		return "▊"
 	end,
-	color = { fg = mocha.yellow },
+	color = { fg = palette.yellow },
 	padding = { left = 0, right = 1 },
 })
 
@@ -900,35 +973,35 @@ ins_left({
 			-- r = "󰰐 ",
 			-- rm = "󰰐 ",
 			-- ['r?'] = "󰰐 ",
-			-- no = mocha.red,
-			-- ic = mocha.yellow,
-			-- ['!'] = mocha.red,
+			-- no = palette.red,
+			-- ic = palette.yellow,
+			-- ['!'] = palette.red,
 		}
 		return mode_component[vim.fn.mode()]
 	end,
 	color = function()
 		-- auto change color according to neovims mode
 		local mode_color = {
-			n = mocha.blue,
-			i = mocha.green,
-			v = mocha.pink,
-			[""] = mocha.pink,
-			V = mocha.pink,
-			R = mocha.red,
-			Rv = mocha.red,
-			c = mocha.mauve,
-			s = mocha.peach,
-			S = mocha.peach,
-			[""] = mocha.peach,
-			t = mocha.lavender,
-			-- cv = mocha.sky,
-			-- ce = mocha.sky,
-			-- r = mocha.lavender,
-			-- rm = mocha.lavender,
-			-- ['r?'] = mocha.lavender,
-			-- no = mocha.red,
-			-- ic = mocha.yellow,
-			-- ['!'] = mocha.red,
+			n = palette.blue,
+			i = palette.green,
+			v = palette.pink,
+			[""] = palette.pink,
+			V = palette.pink,
+			R = palette.red,
+			Rv = palette.red,
+			c = palette.mauve,
+			s = palette.peach,
+			S = palette.peach,
+			[""] = palette.peach,
+			t = palette.lavender,
+			-- cv = palette.sky,
+			-- ce = palette.sky,
+			-- r = palette.lavender,
+			-- rm = palette.lavender,
+			-- ['r?'] = palette.lavender,
+			-- no = palette.red,
+			-- ic = palette.yellow,
+			-- ['!'] = palette.red,
 		}
 		return { fg = mode_color[vim.fn.mode()] }
 	end,
@@ -938,20 +1011,20 @@ ins_left({
 ins_left({
 	"filename",
 	cond = lualine_conditions.buffer_not_empty,
-	color = { fg = mocha.pink, gui = "bold" },
+	color = { fg = palette.pink, gui = "bold" },
 })
 
 ins_left({
 	-- filesize component
 	"filesize",
-	color = { fg = mocha.lavender },
+	color = { fg = palette.lavender },
 	cond = lualine_conditions.buffer_not_empty,
 })
 
 ins_left({
 	"branch",
 	icon = "",
-	color = { fg = mocha.peach, gui = "bold" },
+	color = { fg = palette.peach, gui = "bold" },
 })
 
 ins_left({
@@ -959,9 +1032,9 @@ ins_left({
 	-- Is it me or the symbol for modified us really weird
 	symbols = { added = " ", modified = " ", removed = " " },
 	diff_color = {
-		added = { fg = mocha.green },
-		modified = { fg = mocha.yellow },
-		removed = { fg = mocha.red },
+		added = { fg = palette.green },
+		modified = { fg = palette.yellow },
+		removed = { fg = palette.red },
 	},
 	cond = lualine_conditions.hide_in_width,
 })
@@ -998,39 +1071,39 @@ ins_left({
 		return msg
 	end,
 	icon = " LSP:",
-	color = { fg = mocha.lavender, gui = "bold" },
+	color = { fg = palette.lavender, gui = "bold" },
 })
 
 -- Add components to right sections
 ins_right({
 	"searchcount",
 	cond = lualine_conditions.hide_in_width,
-	color = { fg = mocha.mauve, gui = "bold" },
+	color = { fg = palette.mauve, gui = "bold" },
 })
 
 ins_right({
 	"o:encoding", -- option component same as &encoding in viml
 	fmt = string.upper, -- I'm not sure why it's upper case either ;)
 	cond = lualine_conditions.hide_in_width,
-	color = { fg = mocha.green, gui = "bold" },
+	color = { fg = palette.green, gui = "bold" },
 })
 
 ins_right({
 	"fileformat",
 	fmt = string.upper,
 	icons_enabled = false, -- I think icons are cool but Eviline doesn't have them. sigh
-	color = { fg = mocha.green, gui = "bold" },
+	color = { fg = palette.green, gui = "bold" },
 })
 
-ins_right({ "location", color = { fg = mocha.lavender } })
+ins_right({ "location", color = { fg = palette.lavender } })
 
-ins_right({ "progress", color = { fg = mocha.lavender, gui = "bold" } })
+ins_right({ "progress", color = { fg = palette.lavender, gui = "bold" } })
 
 ins_right({
 	function()
 		return "▊"
 	end,
-	color = { fg = mocha.yellow },
+	color = { fg = palette.yellow },
 	padding = { left = 1 },
 })
 
@@ -1166,8 +1239,8 @@ require("nvim-treesitter.configs").setup({
 ------------------
 --- #lspconfig ---
 ------------------
-vim.cmd("autocmd! ColorScheme * highlight NormalFloat guibg=" .. mocha.base)
-vim.cmd("autocmd! ColorScheme * highlight FloatBorder guifg=" .. mocha.text .. " guibg=" .. mocha.base)
+vim.cmd("autocmd! ColorScheme * highlight NormalFloat guibg=" .. palette.base)
+vim.cmd("autocmd! ColorScheme * highlight FloatBorder guifg=" .. palette.text .. " guibg=" .. palette.base)
 local border = {
 	{ "╭", "FloatBorder" },
 	{ "─", "FloatBorder" },
@@ -1315,7 +1388,7 @@ require("mason").setup({
 		"ruff",
 		"shellcheck",
 		"shfmt",
-    "taplo",
+		"taplo",
 		"texlab",
 		"typstfmt",
 		"typst-lsp",
@@ -1824,7 +1897,7 @@ autocmd("User", {
 --------------
 --- #flash ---
 --------------
-vim.cmd("highlight Flashlabel guifg=" .. mocha.red)
+vim.cmd("highlight Flashlabel guifg=" .. palette.red)
 
 function JumpToLine()
 	require("flash").jump({
@@ -1836,17 +1909,16 @@ end
 
 map({ "n", "x", "o" }, "\\\\", "<cmd>lua JumpToLine()<CR>", default_opts("Jump to a line"))
 
-
 -----------------
 --- #undotree ---
 -----------------
 require("undotree").setup({
-  window = {
-    winblend = 20,
-  },
-  keymaps = {
-    ['gp'] = "move2parent",
-  },
+	window = {
+		winblend = 20,
+	},
+	keymaps = {
+		["gp"] = "move2parent",
+	},
 })
 vim.keymap.set("n", "<leader>u", require("undotree").toggle, default_opts("Toggle undotree"))
 
