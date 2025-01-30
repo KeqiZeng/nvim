@@ -36,3 +36,4 @@ require("lazy").setup({
 })
 
 require("terminal")
+require("smartcolumn")
