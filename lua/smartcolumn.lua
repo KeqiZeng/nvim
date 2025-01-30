@@ -2,8 +2,55 @@ local LINE_LIMIT = 120
 local DEBOUNCE_TIME = 200  -- milliseconds
 local check_timer_id = nil -- Debounce timer ID
 
+local excluded_filetypes = {
+    "checkhealth",
+    "lazy",
+    "mason",
+    "lspinfo",
+    "fzf",
+    "qf",
+}
+
+local excluded_buftypes = {
+    "terminal",
+    "help",
+    "nofile",
+    "prompt",
+}
+
+-- Function to check if current buffer should be excluded
+local function should_exclude_buffer()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local filetype = vim.bo[bufnr].filetype
+    local buftype = vim.bo[bufnr].buftype
+
+    -- Check if filetype is in excluded list
+    for _, ft in ipairs(excluded_filetypes) do
+        if filetype == ft then
+            return true
+        end
+    end
+
+    -- Check if buftype is in excluded list
+    for _, bt in ipairs(excluded_buftypes) do
+        if buftype == bt then
+            return true
+        end
+    end
+
+    return false
+end
+
 -- Check if any line in the visible window exceeds the line limit
 local function check_line_length()
+    -- Skip excluded buffers
+    if should_exclude_buffer() then
+        -- Clear colorcolumn for excluded buffers
+        local winnr = vim.api.nvim_get_current_win()
+        vim.api.nvim_win_set_option(winnr, 'colorcolumn', '')
+        return
+    end
+
     -- Cancel the previous timer if it exists
     if check_timer_id then
         vim.fn.timer_stop(check_timer_id)
