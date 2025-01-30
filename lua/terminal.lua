@@ -11,7 +11,7 @@ local function toggle_terminal()
         local win = vim.api.nvim_get_current_win()
         vim.cmd('terminal')
         term_buf = vim.api.nvim_get_current_buf()
-        
+
         -- Set terminal window height
         vim.api.nvim_win_set_height(win, term_height)
         -- Hide terminal buffer from buffer list
@@ -42,7 +42,7 @@ local function toggle_terminal()
 end
 
 -- Set up Ctrl+t to toggle terminal in both normal and terminal mode
-vim.keymap.set({'n', 't'}, '<C-t>', function()
+vim.keymap.set({ 'n', 't' }, '<C-t>', function()
     toggle_terminal()
 end, { noremap = true, silent = true })
 
@@ -55,20 +55,20 @@ vim.api.nvim_create_autocmd("TermOpen", {
     pattern = "*",
     callback = function()
         -- Hide terminal buffer from buffer list
-        vim.opt_local.buflisted = false      -- Don't show in buffer list
-        vim.opt_local.bufhidden = 'hide'     -- Hide buffer when window is closed
-        
+        vim.opt_local.buflisted = false  -- Don't show in buffer list
+        vim.opt_local.bufhidden = 'hide' -- Hide buffer when window is closed
+
         -- Disable UI elements
-        vim.opt_local.number = false          -- Disable line numbers
-        vim.opt_local.relativenumber = false  -- Disable relative line numbers
-        vim.opt_local.cursorline = false      -- Disable cursor line highlight
-        vim.opt_local.list = false            -- Disable list mode
-        vim.opt_local.spell = false           -- Disable spell check
-        vim.opt_local.wrap = false            -- Disable wrap
-        vim.opt_local.signcolumn = "no"       -- Disable signcolumn
-        vim.opt_local.cursorcolumn = false    -- Disable cursor column highlight
-        vim.opt_local.foldenable = false      -- Disable fold
-        vim.b.miniindentscope_disable = true  -- Disable indent scope
+        vim.opt_local.number = false         -- Disable line numbers
+        vim.opt_local.relativenumber = false -- Disable relative line numbers
+        vim.opt_local.cursorline = false     -- Disable cursor line highlight
+        vim.opt_local.list = false           -- Disable list mode
+        vim.opt_local.spell = false          -- Disable spell check
+        vim.opt_local.wrap = false           -- Disable wrap
+        vim.opt_local.signcolumn = "no"      -- Disable signcolumn
+        vim.opt_local.cursorcolumn = false   -- Disable cursor column highlight
+        vim.opt_local.foldenable = false     -- Disable fold
+        vim.b.miniindentscope_disable = true -- Disable indent scope
 
         -- Start in insert mode
         vim.cmd('startinsert')
