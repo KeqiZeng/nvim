@@ -1,0 +1,50 @@
+return {
+	"williamboman/mason.nvim",
+	cmd = "Mason",
+	build = ":MasonUpdate",
+    config = function()
+        require("mason").setup({
+            ui = {
+                border = {
+                    { "╭", "FloatBorder" },
+                    { "─", "FloatBorder" },
+                    { "╮", "FloatBorder" },
+                    { "│", "FloatBorder" },
+                    { "╯", "FloatBorder" },
+                    { "─", "FloatBorder" },
+                    { "╰", "FloatBorder" },
+                    { "│", "FloatBorder" },
+                },
+            },
+            ensure_installed = {
+                "bash-language-server",
+                "cmake-language-server",
+                "css-lsp",
+                "eslint-lsp",
+                "golangci-lint",
+                "gopls",
+                "html-lsp",
+                "json-lsp",
+                "latexindent",
+                "lua-language-server",
+                "selene",
+                "stylua",
+                "markdownlint",
+                "prettier",
+                "pyright",
+                "rust-analyzer",
+                "ruff",
+                "shellcheck",
+                "shfmt",
+                "taplo",
+                "texlab",
+                "tinymist",
+                "typstfmt",
+                "vale-ls",
+                "yaml-language-server",
+                "yamlfmt",
+                "yamllint",
+            },
+        })
+    end
+}

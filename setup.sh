@@ -7,11 +7,11 @@ brew install neovim
 pip install neovim pynvim
 
 # autoSwitchIm
-brew tap daipeihust/tap
-brew install im-select
+brew tap laishulu/homebrew
+brew install macism
 
-# telescope
-brew install ripgrep fd
+# fzf
+brew install fzf ripgrep fd bat
 
 # treesitter
 brew install tree-sitter
