@@ -2,13 +2,14 @@ return {
     'echasnovski/mini.clue',
     version = '*',
     event = "BufReadPost",
-    config = function()
+    opts = function()
         local miniclue = require('mini.clue')
-        miniclue.setup({
+        return {
             window = {
                 config = {
                     width = 50,
                     border = 'rounded',
+                    zindex = 100,
                 }
             },
             triggers = {
@@ -35,6 +36,10 @@ return {
                 { mode = 'n', keys = 'z' },
                 { mode = 'x', keys = 'z' },
 
+                -- 's' key
+                { mode = 'n', keys = 's' },
+                { mode = 'x', keys = 's' },
+
                 -- Leader triggers
                 { mode = 'n', keys = '<leader>' },
                 { mode = 'x', keys = '<leader>' },
@@ -57,7 +62,7 @@ return {
                 { mode = 'x', keys = '<leader>h',  desc = 'Hunks' },
                 { mode = 'n', keys = '<leader>m',  desc = 'MultiCursor' },
                 { mode = 'x', keys = '<leader>m',  desc = 'MultiCursor' },
-                { mode = 'n', keys = 'gs',         desc = 'Swap parameters' },
+                { mode = 'n', keys = 'gS',         desc = 'Swap parameters' },
 
                 -- submode multicursor <leader>m
                 { mode = 'n', keys = '<leader>mj', postkeys = '<leader>m' },
@@ -73,6 +78,11 @@ return {
                 { mode = 'n', keys = '<leader>mx', postkeys = '<leader>m' },
                 { mode = 'n', keys = '<leader>mA', postkeys = '<leader>m' },
             },
-        })
+
+        }
+    end,
+    init = function()
+        -- disable s key for mini.surround so that clue can works for s key
+        vim.keymap.set({ 'n', 'x' }, 's', '<nop>')
     end
 }

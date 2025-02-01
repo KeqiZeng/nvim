@@ -68,10 +68,26 @@ vim.api.nvim_create_autocmd("TermOpen", {
         vim.opt_local.signcolumn = "no"      -- Disable signcolumn
         vim.opt_local.cursorcolumn = false   -- Disable cursor column highlight
         vim.opt_local.foldenable = false     -- Disable fold
-        vim.b.miniindentscope_disable = true -- Disable indent scope
+        vim.b.miniindentscope_disable = true -- Disable indentscope
+    end
+})
+
+vim.api.nvim_create_autocmd("TermEnter", {
+    pattern = "*",
+    callback = function()
+        vim.cmd("lua MiniMap.close()")
+        vim.g.minimap_opened = false
 
         -- Start in insert mode
         vim.cmd('startinsert')
+    end
+})
+
+vim.api.nvim_create_autocmd("TermLeave", {
+    pattern = "*",
+    callback = function()
+        vim.cmd("lua MiniMap.open()")
+        vim.g.minimap_opened = true
     end
 })
 

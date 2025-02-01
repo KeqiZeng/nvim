@@ -2,22 +2,21 @@ return {
     "echasnovski/mini.files",
     event = "BufEnter",
     version = "*",
-    config = function()
-        require("mini.files").setup({
-            content = {
-                filter = function(fs_entry)
-                    return not vim.startswith(fs_entry.name, ".")
-                end,
-            },
-            mappings = {
-                go_in = "L",
-                go_in_plus = "l",
-                go_out = "H",
-                go_out_plus = "h",
-                reset = "-"
-            },
-        })
-
+    opts = {
+        content = {
+            filter = function(fs_entry)
+                return not vim.startswith(fs_entry.name, ".")
+            end,
+        },
+        mappings = {
+            go_in = "L",
+            go_in_plus = "l",
+            go_out = "H",
+            go_out_plus = "h",
+            reset = "-"
+        },
+    },
+    init = function()
         vim.api.nvim_create_autocmd('User', {
             pattern = 'MiniFilesWindowOpen',
             callback = function(args)
@@ -30,13 +29,13 @@ return {
             end,
         })
 
-        function minifiles_toggle(...)
+        function Minifiles_toggle(...)
             if not MiniFiles.close() then
                 MiniFiles.open(...)
             end
         end
 
-        vim.keymap.set("n", "<C-f>", "<cmd>lua minifiles_toggle()<cr>", { desc = "Toggle MiniFiles" })
+        vim.keymap.set("n", "<C-f>", "<cmd>lua Minifiles_toggle()<cr>", { desc = "Toggle MiniFiles" })
 
         local map_split = function(buf_id, lhs, direction)
             local rhs = function()

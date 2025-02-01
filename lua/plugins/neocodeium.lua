@@ -1,8 +1,8 @@
 return {
     "monkoose/neocodeium",
     event = "BufReadPost",
-    config = function()
-        require("neocodeium").setup()
+    opts = {},
+    init = function()
         vim.keymap.set("i", "<C-a>", function()
             require("neocodeium").accept()
         end, { noremap = true, silent = true })
@@ -15,5 +15,22 @@ return {
         vim.keymap.set("i", "<C-e>", function()
             require("neocodeium").clear()
         end, { noremap = true, silent = true })
+
+        vim.api.nvim_create_autocmd('User', {
+            pattern = 'BlinkCmpMenuOpen',
+            callback = function()
+                require('neocodeium').clear()
+                require('neocodeium.commands').disable()
+                -- vim.fn['codeium#Clear']()
+                -- vim.g.codeium_enabled = false
+            end,
+        })
+        vim.api.nvim_create_autocmd('User', {
+            pattern = 'BlinkCmpMenuClose',
+            callback = function()
+                require('neocodeium.commands').enable()
+                -- vim.g.codeium_enabled = true
+            end,
+        })
     end,
 }

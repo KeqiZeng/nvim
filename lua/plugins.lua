@@ -13,6 +13,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     require("plugins.catppuccin"),
+    require("plugins.icons"),
     require("plugins.lualine"),
     require("plugins.treesitter"),
     require("plugins.treesitter-context"),
@@ -26,6 +27,7 @@ require("lazy").setup({
     require("plugins.autopairs"),
     require("plugins.rainbow"),
     require("plugins.hipatters"),
+    require("plugins.map"),
     require("plugins.jump"),
     require("plugins.jump2d"),
     require("plugins.surround"), -- surround maybe have to after jump2d, for `ds` keymap

@@ -2,16 +2,15 @@ return {
     'echasnovski/mini.jump2d',
     event = 'BufReadPost',
     version = '*',
-    config = function()
-        require('mini.jump2d').setup({
-            view = {
-                dim = true,
-            },
-            mappings = {
-                start_jumping = 's',
-            },
-
-        })
+    opts = {
+        view = {
+            dim = true,
+        },
+        mappings = {
+            start_jumping = 'gs',
+        },
+    },
+    init = function()
         vim.keymap.set(
             { 'n', 'x', 'o' }, '\\\\',
             '<Cmd>lua MiniJump2d.start(MiniJump2d.builtin_opts.line_start)<CR>',
@@ -29,6 +28,5 @@ return {
             '<Cmd>lua MiniJump2d.start(MiniJump2d.builtin_opts.word_start)<CR>',
             { desc = 'Jump to a word' }
         )
-        vim.cmd("highlight! link MiniJump2dSpot String")
     end
 }

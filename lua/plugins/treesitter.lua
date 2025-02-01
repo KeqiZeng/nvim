@@ -32,14 +32,14 @@ return {
                 swap = {
                     enable = true,
                     swap_next = {
-                        ["gsn"] = {
+                        ["gSn"] = {
                             mode = "n",
                             query = "@parameter.inner",
                             desc = "Swap next parameter",
                         },
                     },
                     swap_previous = {
-                        ["gsp"] = {
+                        ["gSp"] = {
                             mode = "n",
                             query = "@parameter.inner",
                             desc = "Swap previous parameter",

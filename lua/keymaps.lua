@@ -37,7 +37,7 @@ map({ "n", "x", "o" }, "gl", "$", { desc = "Go to line end" })
 map("v", "<", "<gv", { desc = "Indent left" })
 map("v", ">", ">gv", { desc = "Indent right" })
 
-map("n", "<BACKSPACE>", "<cmd>nohl<CR>", { desc = "Clear hlsearch" })
+-- map("n", "<backspace>", "<cmd>nohl<cr>", { desc = "Clear hlsearch" })
 
 -- Resize window using <ctrl> arrow keys
 map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
@@ -52,4 +52,3 @@ map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 -- Toggle options
 map("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "Toggle wrap" })
 map("n", "<leader>ts", "<cmd>set spell!<cr>", { desc = "Toggle spell" })
-

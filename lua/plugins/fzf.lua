@@ -1,13 +1,11 @@
 return {
     "ibhagwan/fzf-lua",
     event = "BufEnter",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
-        file_icon_padding = ' ',
-    },
-    config = function()
+    dependencies = { "echasnovski/mini.icons" },
+    opts = function()
         local actions = require("fzf-lua").actions
-        require("fzf-lua").setup({
+        return {
+            file_icon_padding = ' ',
             "hide",
             keymap = {
                 builtin = {
@@ -19,12 +17,9 @@ return {
                 },
                 fzf = {
                     false,
-                    ["ctrl-z"] = "abort",
                     ["ctrl-q"] = "unix-line-discard",
                     ["ctrl-a"] = "beginning-of-line",
                     ["ctrl-e"] = "end-of-line",
-                    ["ctrl-g"] = "first",
-                    ["ctrl-G"] = "last",
                 },
             },
             actions = {
@@ -39,73 +34,86 @@ return {
                     ["ctrl-f"] = actions.toggle_follow,
                 },
             }
-        })
+        }
+    end,
+    init = function()
+        local fzf = require("fzf-lua")
+        fzf.register_ui_select()
 
-        vim.keymap.set("n", "<C-r>", function()
-            require("fzf-lua").resume()
-        end, { noremap = true, silent = true, desc = "FZF resume" })
+        local map = vim.keymap.set
+        local function opts(desc)
+            return { noremap = true, silent = true, desc = desc }
+        end
 
-        vim.keymap.set("n", "<leader>ff", function()
-            require("fzf-lua").files()
-        end, { noremap = true, silent = true, desc = "Find files" })
+        map("n", "<C-r>", function()
+            fzf.resume()
+        end, opts("FZF Resume"))
 
-        vim.keymap.set("n", "<leader>fr", function()
-            require("fzf-lua").oldfiles()
-        end, { noremap = true, silent = true, desc = "Find recent files" })
+        map("n", "<leader>ff", function()
+            fzf.files()
+        end, opts("Find files"))
 
-        vim.keymap.set("n", "<leader>fb", function()
-            require("fzf-lua").buffers()
-        end, { noremap = true, silent = true, desc = "Find opened buffers" })
+        map("n", "<leader>fr", function()
+            fzf.oldfiles()
+        end, opts("Find old files"))
 
-        vim.keymap.set("n", "<leader>fg", function()
-            require("fzf-lua").lgrep_curbuf()
-        end, { noremap = true, silent = true, desc = "Live grep current buffer" })
+        map("n", "<leader>fb", function()
+            fzf.buffers()
+        end, opts("Find buffers"))
 
-        vim.keymap.set("n", "<leader>fg", function()
-            require("fzf-lua").live_grep_native()
-        end, { noremap = true, silent = true, desc = "Live grep current project" })
+        map("n", "<leader>fg", function()
+            fzf.lgrep_curbuf()
+        end, opts("Live grep current buffer"))
 
-        vim.keymap.set("n", "<leader>fc", function()
-            require("fzf-lua").commands_history()
-        end, { noremap = true, silent = true, desc = "Find command history" })
+        map("n", "<leader>fG", function()
+            fzf.live_grep_native()
+        end, opts("Live grep current project"))
 
-        vim.keymap.set("n", "<leader>f/", function()
-            require("fzf-lua").search_history()
-        end, { noremap = true, silent = true, desc = "Find search history" })
+        map("n", "<leader>fc", function()
+            fzf.command_history()
+        end, opts("Find command history"))
 
-        vim.keymap.set("n", "<leader>fm", function()
-            require("fzf-lua").marks()
-        end, { noremap = true, silent = true, desc = "Find marks" })
+        map("n", "<leader>f/", function()
+            fzf.search_history()
+        end, opts("Find search history"))
 
-        vim.keymap.set("n", "<leader>fj", function()
-            require("fzf-lua").jumps()
-        end, { noremap = true, silent = true, desc = "Find jumps positions" })
+        map("n", "<leader>fm", function()
+            fzf.marks()
+        end, opts("Find marks"))
 
-        vim.keymap.set("n", "<leader>fk", function()
-            require("fzf-lua").keymaps()
-        end, { noremap = true, silent = true, desc = "Find keymaps" })
+        map("n", "<leader>fj", function()
+            fzf.jumps()
+        end, opts("Find jump locations"))
+
+        map("n", "<leader>fk", function()
+            fzf.keymaps()
+        end, opts("Find keymaps"))
 
         -- Add notification history search
-        vim.keymap.set("n", "<leader>fn", function()
+        map("n", "<leader>fn", function()
             local messages = vim.split(vim.fn.execute('messages'), '\n')
             local items = {}
             -- Filter out empty messages and add them to items
-            for i = #messages, 1, -1 do  -- 反向遍历消息列表
+            for i = #messages, 1, -1 do -- put new messages at the top
                 local msg = messages[i]
                 if msg ~= "" then
                     table.insert(items, msg)
                 end
             end
-            require("fzf-lua").fzf_exec(items, {
+            fzf.fzf_exec(items, {
                 prompt = "Messages> ",
                 actions = {
                     ["default"] = function(selected)
                         local text = selected[1]
-                        vim.fn.setreg("+", text)  -- Copy to system clipboard
+                        vim.fn.setreg("+", text) -- Copy to system clipboard
                         print("Copied to clipboard")
                     end,
                 },
             })
-        end, { noremap = true, silent = true, desc = "Find message history" })
+        end, opts("Find notifications"))
+
+        map({ "n", "x" }, "z=", function()
+            fzf.spell_suggest()
+        end, opts("Find spell suggestions"))
     end
 }

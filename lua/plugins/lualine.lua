@@ -5,7 +5,7 @@ return {
         "echasnovski/mini.icons",
         "catppuccin/nvim",
     },
-    config = function()
+    opts = function()
         local palette = require("catppuccin.palettes").get_palette("mocha")
 
         local function lsp_name()
@@ -32,7 +32,14 @@ return {
             return ""
         end
 
-        require("lualine").setup({
+        local function minimap_offset()
+            if vim.g.minimap_opened then
+                return "        "
+            end
+            return ""
+        end
+
+        return {
             options = {
                 component_separators = { left = '', right = '' },
                 section_separators = { left = '', right = '' },
@@ -84,8 +91,11 @@ return {
                             directory = ' ', -- text to show when the buffer is a directory
                         },
                     },
+                    {
+                        minimap_offset,
+                    },
                 }
             },
-        })
+        }
     end
 }

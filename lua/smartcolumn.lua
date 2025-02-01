@@ -3,19 +3,21 @@ local DEBOUNCE_TIME = 200  -- milliseconds
 local check_timer_id = nil -- Debounce timer ID
 
 local excluded_filetypes = {
+    "help",
+    "man",
+    "gitcommit",
     "checkhealth",
     "lazy",
     "mason",
     "lspinfo",
     "fzf",
-    "qf",
 }
 
 local excluded_buftypes = {
     "terminal",
-    "help",
     "nofile",
     "prompt",
+    "quickfix",
 }
 
 -- Function to check if current buffer should be excluded

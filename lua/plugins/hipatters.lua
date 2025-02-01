@@ -3,9 +3,9 @@ return {
     version = '*',
     event = "UIEnter",
     dependencies = { "catppuccin/nvim" },
-    config = function()
+    opts = function()
         local hipatterns = require('mini.hipatterns')
-        hipatterns.setup({
+        return {
             highlighters = {
                 -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
                 fixme     = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
@@ -16,7 +16,9 @@ return {
                 -- Highlight hex color strings (`#rrggbb`) using that color
                 hex_color = hipatterns.gen_highlighter.hex_color(),
             },
-        })
+        }
+    end,
+    init = function()
         local palette = require("catppuccin.palettes").get_palette("mocha")
         vim.cmd("highlight MiniHipatternsNote guibg=" .. palette.mauve)
 

@@ -2,9 +2,7 @@ return {
     'saghen/blink.cmp',
     version = '*', -- release tag
     event = 'InsertEnter',
-    dependencies = { 'monkoose/neocodeium' },
-
-    config = function()
+    opts = function()
         local function has_words_before()
             local cursor = vim.api.nvim_win_get_cursor(0)
             local line = cursor[1]
@@ -15,24 +13,7 @@ return {
                 == nil
         end
 
-        vim.api.nvim_create_autocmd('User', {
-            pattern = 'BlinkCmpMenuOpen',
-            callback = function()
-                require('neocodeium').clear()
-                require('neocodeium.commands').disable()
-                -- vim.fn['codeium#Clear']()
-                -- vim.g.codeium_enabled = false
-            end,
-        })
-        vim.api.nvim_create_autocmd('User', {
-            pattern = 'BlinkCmpMenuClose',
-            callback = function()
-                require('neocodeium.commands').enable()
-                -- vim.g.codeium_enabled = true
-            end,
-        })
-
-        require('blink.cmp').setup({
+        return {
             appearance = {
                 nerd_font_variant = 'mono'
             },
@@ -96,7 +77,6 @@ return {
             sources = {
                 default = { 'lsp', 'path', 'snippets', 'buffer' },
             },
-
-        })
-    end
+        }
+    end,
 }
