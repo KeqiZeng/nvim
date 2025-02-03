@@ -19,8 +19,7 @@ return {
                     diff = diff .. '%#MiniStatuslineDiffDelete#-' .. diff_status.delete .. " "
                 end
             end
-            if statusline.is_truncated(args.trunc_width) then return "" end
-            return diff
+            return statusline.is_truncated(args.trunc_width) and "" or diff
         end
 
         local gen_diagnostics = function(args)
@@ -42,8 +41,7 @@ return {
             if hints > 0 then
                 diagnostics = diagnostics .. '%#MiniStatuslineDiagHint# ' .. hints .. " "
             end
-            if statusline.is_truncated(args.trunc_width) then return "" end
-            return diagnostics
+            return statusline.is_truncated(args.trunc_width) and "" or diagnostics
         end
 
         vim.g.code_action_available = false
@@ -54,23 +52,10 @@ return {
             return ""
         end
 
-        local branch_cache = {
-            branch = "",
-            last_update = 0,
-            update_interval = 5000,
-            last_bufnr = nil
-        }
-
+        local branch_cached = ""
         local function update_git_branch()
             vim.schedule(function()
-                local current_time = vim.loop.now()
                 local current_bufnr = vim.api.nvim_get_current_buf()
-
-                -- Do not update if the it's updated recently and the buffer has not changed
-                if current_time - branch_cache.last_update < branch_cache.update_interval
-                    and current_bufnr == branch_cache.last_bufnr then
-                    return
-                end
 
                 -- Get directory of current buffer
                 local bufname = vim.api.nvim_buf_get_name(current_bufnr)
@@ -86,22 +71,24 @@ return {
                 local branch = vim.fn.system(cmd)
 
                 if vim.v.shell_error == 0 and branch ~= "" then
-                    branch_cache.branch = " 󰘬 " .. branch .. " "
+                    branch_cached = " 󰘬 " .. branch .. " "
                 else
-                    branch_cache.branch = ""
+                    branch_cached = ""
                 end
-
-                branch_cache.last_update = current_time
-                branch_cache.last_bufnr = current_bufnr
             end)
         end
 
         update_git_branch()
+        vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost", "BufNewFile", "FocusGained" }, {
+            pattern = "*",
+            callback = function()
+                update_git_branch()
+            end
+        })
 
         local function gen_branch(args)
-            local branch = branch_cache.branch == "" and "" or "%#MiniStatuslineBranch#" .. branch_cache.branch
-            if statusline.is_truncated(args.trunc_width) then return "" end
-            return branch
+            local branch = branch_cached == "" and "" or "%#MiniStatuslineBranch#" .. branch_cached
+            return statusline.is_truncated(args.trunc_width) and "" or branch
         end
 
         local function gen_statusline()
@@ -134,7 +121,6 @@ return {
         return {
             content = {
                 active = gen_statusline,
-                inactive = nil
             }
         }
     end,

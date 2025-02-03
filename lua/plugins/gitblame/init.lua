@@ -8,6 +8,8 @@ local DEBOUNCE_TIME = 500 -- milliseconds
 
 -- State
 local check_timer_id = nil
+local last_line = nil
+local last_buf = nil
 
 -- Utility functions
 local function format_time_ago(timestamp)
@@ -82,6 +84,9 @@ end
 
 local function clear_blame_info(bufnr)
     vim.api.nvim_buf_clear_namespace(bufnr, ns_id, 0, -1)
+    -- Reset state
+    last_buf = nil
+    last_line = nil
 end
 
 local function show_blame_info(bufnr, line, text)
@@ -90,6 +95,8 @@ local function show_blame_info(bufnr, line, text)
         virt_text_pos = "eol",
         hl_mode = "combine",
     })
+    last_buf = bufnr
+    last_line = line
 end
 
 local function format_blame_message(author, time_ago, summary)
@@ -109,16 +116,19 @@ local function show_git_blame()
     end
 
     local bufnr = vim.api.nvim_get_current_buf()
-    -- 如果文件有未保存的更改，不显示 git blame
-    if vim.bo[bufnr].modified then
-        clear_blame_info(bufnr)
-        return
-    end
-
     local line = vim.api.nvim_win_get_cursor(0)[1]
     local file = vim.fn.expand('%:p')
 
+    if last_buf == bufnr and last_line == line then
+        return
+    end
+
     clear_blame_info(bufnr)
+
+    -- If buffer is modified, don't show git blame
+    if vim.bo[bufnr].modified then
+        return
+    end
 
     -- Check if the file is in a git repository
     vim.fn.jobstart({ "git", "ls-files", "--error-unmatch", file }, {
@@ -196,7 +206,7 @@ function M.setup()
         desc = "Update git blame info for the current line",
     })
 
-    vim.api.nvim_create_autocmd({ "CursorMoved", "InsertEnter" }, {
+    vim.api.nvim_create_autocmd({ "CursorMoved", "InsertEnter", "TextChanged" }, {
         callback = function()
             clear_blame_info(vim.api.nvim_get_current_buf())
         end,
