@@ -79,6 +79,9 @@ opt.inccommand = "nosplit"
 -- Global statusline
 opt.laststatus = 3
 
+-- Disable search count in cmd
+opt.shortmess:append("S")
+
 -- DON'T autochange directory to the one where the file is
 opt.autochdir = false
 

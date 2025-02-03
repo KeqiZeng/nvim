@@ -2,7 +2,6 @@ return {
     'echasnovski/mini.hipatterns',
     version = '*',
     event = "UIEnter",
-    dependencies = { "catppuccin/nvim" },
     opts = function()
         local hipatterns = require('mini.hipatterns')
         return {
@@ -19,9 +18,6 @@ return {
         }
     end,
     init = function()
-        local palette = require("catppuccin.palettes").get_palette("mocha")
-        vim.cmd("highlight MiniHipatternsNote guibg=" .. palette.mauve)
-
         -- Add keybinding to search for FIXME/HACK/TODO/NOTE
         vim.keymap.set("n", "<leader>ft", function()
             require("fzf-lua").live_grep_native({

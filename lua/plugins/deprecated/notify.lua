@@ -1,6 +1,6 @@
 return {
     'echasnovski/mini.notify',
     version = '*',
-    event = "BufReadPost",
+    -- event = "BufReadPost",
     opts = {},
 }

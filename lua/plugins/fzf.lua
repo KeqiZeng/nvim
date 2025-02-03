@@ -89,29 +89,6 @@ return {
             fzf.keymaps()
         end, opts("Find keymaps"))
 
-        -- Add notification history search
-        map("n", "<leader>fn", function()
-            local messages = vim.split(vim.fn.execute('messages'), '\n')
-            local items = {}
-            -- Filter out empty messages and add them to items
-            for i = #messages, 1, -1 do -- put new messages at the top
-                local msg = messages[i]
-                if msg ~= "" then
-                    table.insert(items, msg)
-                end
-            end
-            fzf.fzf_exec(items, {
-                prompt = "Messages> ",
-                actions = {
-                    ["default"] = function(selected)
-                        local text = selected[1]
-                        vim.fn.setreg("+", text) -- Copy to system clipboard
-                        print("Copied to clipboard")
-                    end,
-                },
-            })
-        end, opts("Find notifications"))
-
         map({ "n", "x" }, "z=", function()
             fzf.spell_suggest()
         end, opts("Find spell suggestions"))

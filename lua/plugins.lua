@@ -14,7 +14,8 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
     require("plugins.catppuccin"),
     require("plugins.icons"),
-    require("plugins.lualine"),
+    require("plugins.statusline"),
+    require("plugins.tabline"),
     require("plugins.treesitter"),
     require("plugins.treesitter-context"),
     require("plugins.lsp"),
@@ -27,15 +28,46 @@ require("lazy").setup({
     require("plugins.autopairs"),
     require("plugins.rainbow"),
     require("plugins.hipatters"),
+    require("plugins.diff"),
     require("plugins.map"),
     require("plugins.jump"),
     require("plugins.jump2d"),
     require("plugins.surround"), -- surround maybe have to after jump2d, for `ds` keymap
     require("plugins.fzf"),
     require("plugins.multicursor"),
-    require("plugins.gitsigns"),
-    require("plugins.clue")
+    require("plugins.clue"),
+    -- local plugins
+    {
+        dir = vim.fn.stdpath("config") .. "/lua/plugins/terminal",
+        keys = {
+            {
+                "<C-t>",
+                function()
+                    require("plugins.terminal").toggle()
+                end,
+                mode = { "n", "t" },
+                desc = "Toggle terminal"
+            },
+        },
+        config = function()
+            require("plugins.terminal").setup()
+        end
+    },
+    {
+        dir = vim.fn.stdpath("config") .. "/lua/plugins/smartcolumn",
+        event = { "BufReadPost", "BufNewFile" },
+        config = function()
+            require("plugins.smartcolumn").setup()
+        end
+    },
+    {
+        dir = vim.fn.stdpath("config") .. "/lua/plugins/gitblame",
+        dependencies = {
+            "echasnovski/mini.diff",
+        },
+        event = { "BufReadPost", "BufNewFile" },
+        config = function()
+            require("plugins.gitblame").setup()
+        end
+    },
 })
-
-require("terminal")
-require("smartcolumn")

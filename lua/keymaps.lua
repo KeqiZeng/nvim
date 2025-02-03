@@ -31,8 +31,8 @@ map(
 
 map("n", "U", "<C-r>", { desc = "Redo" })
 
-map({ "n", "x", "o" }, "gh", "^", { desc = "Go to line start" })
-map({ "n", "x", "o" }, "gl", "$", { desc = "Go to line end" })
+map({ "n", "x", "o" }, "H", "^", { desc = "Go to line start" })
+map({ "n", "x", "o" }, "L", "$", { desc = "Go to line end" })
 
 map("v", "<", "<gv", { desc = "Indent left" })
 map("v", ">", ">gv", { desc = "Indent right" })

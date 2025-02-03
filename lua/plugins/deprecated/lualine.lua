@@ -6,7 +6,7 @@ return {
         "catppuccin/nvim",
     },
     opts = function()
-        local palette = require("catppuccin.palettes").get_palette("mocha")
+        local colors = require("catppuccin.palettes").get_palette("mocha")
 
         local function lsp_name()
             local msg = "No Active Lsp"
@@ -32,13 +32,6 @@ return {
             return ""
         end
 
-        local function minimap_offset()
-            if vim.g.minimap_opened then
-                return "        "
-            end
-            return ""
-        end
-
         return {
             options = {
                 component_separators = { left = '', right = '' },
@@ -47,12 +40,29 @@ return {
             always_show_tabline = false,
             sections = {
                 lualine_a = { 'mode' },
-                lualine_b = { 'branch', 'diff', 'diagnostics' },
+                lualine_b = {
+                    'branch',
+                    {
+                        'diff',
+                        source = function()
+                            if vim.b.minidiff_summary then
+                                local s = vim.b.minidiff_summary
+                                return {
+                                    added = s.add,
+                                    modified = s.change,
+                                    removed = s.delete
+                                }
+                            end
+                            return nil
+                        end
+                    },
+                    'diagnostics'
+                },
                 lualine_c = {
                     {
                         lsp_name,
                         icon = " LSP:",
-                        color = { fg = palette.lavender, gui = "bold" }
+                        color = { fg = colors.lavender, gui = "bold" }
                     },
                     {
                         code_action_indicator,
@@ -61,29 +71,29 @@ return {
                 lualine_x = {
                     {
                         'filename',
-                        color = { fg = palette.lavender }
+                        color = { fg = colors.lavender }
                     },
                     {
                         'fileformat',
-                        color = { fg = palette.lavender }
+                        color = { fg = colors.lavender }
 
                     },
                     {
                         'encoding',
-                        color = { fg = palette.lavender }
+                        color = { fg = colors.lavender }
                     }
                 },
                 lualine_y = { 'searchcount', 'progress' },
                 lualine_z = { 'location' }
             },
-            winbar = {
+            tabline = {
                 lualine_x = {
                     {
                         'buffers',
                         show_filename_only = false,
                         buffers_color = {
-                            active = { fg = palette.pink },
-                            inactive = { fg = palette.overlay2 },
+                            active = { fg = colors.pink },
+                            inactive = { fg = colors.overlay2 },
                         },
                         symbols = {
                             modified = ' ●', -- text to show when the buffer is modified
@@ -91,9 +101,9 @@ return {
                             directory = ' ', -- text to show when the buffer is a directory
                         },
                     },
-                    {
-                        minimap_offset,
-                    },
+                    -- {
+                    --     minimap_offset,
+                    -- },
                 }
             },
         }

@@ -26,7 +26,7 @@ return {
         local map = require('mini.map')
         vim.keymap.set('n', '<leader>tm', function()
             map.toggle()
-            vim.g.minimap_opened = not vim.g.minimap_opened
+            -- vim.g.minimap_opened = not vim.g.minimap_opened
         end, { desc = "Toggle minimap" })
 
         vim.keymap.set("n", "<backspace>", "<cmd>nohl<cr><cmd>lua MiniMap.refresh(nil, { integrations = true })<cr>",
@@ -37,6 +37,6 @@ return {
             { desc = "Previous search result" })
 
         map.open()
-        vim.g.minimap_opened = true
+        -- vim.g.minimap_opened = true
     end
 }
