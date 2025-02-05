@@ -1,35 +1,40 @@
 return {
     "monkoose/neocodeium",
-    event = "BufReadPost",
-    opts = {},
+    event = "InsertEnter",
+    dependencies = { 'saghen/blink.cmp' },
+    opts = {
+        filter = function()
+            return not require("blink.cmp").is_visible()
+        end,
+    },
     init = function()
+        local neocodeium = require("neocodeium")
         vim.keymap.set("i", "<C-a>", function()
-            require("neocodeium").accept()
+            neocodeium.accept()
         end, { noremap = true, silent = true })
         vim.keymap.set("i", "<C-j>", function()
-            require("neocodeium").cycle_or_complete()
+            neocodeium.cycle_or_complete()
         end, { noremap = true, silent = true })
         vim.keymap.set("i", "<C-k>", function()
-            require("neocodeium").cycle_or_complete(-1)
+            neocodeium.cycle_or_complete(-1)
         end, { noremap = true, silent = true })
+
         vim.keymap.set("i", "<C-e>", function()
-            require("neocodeium").clear()
+            if vim.fn.pumvisible() == 0 then
+                neocodeium.clear()
+            else
+                vim.api.nvim_feedkeys(
+                    vim.api.nvim_replace_termcodes("<C-e>", true, true, true),
+                    "n",
+                    true
+                )
+            end
         end, { noremap = true, silent = true })
 
         vim.api.nvim_create_autocmd('User', {
             pattern = 'BlinkCmpMenuOpen',
             callback = function()
-                require('neocodeium').clear()
-                require('neocodeium.commands').disable()
-                -- vim.fn['codeium#Clear']()
-                -- vim.g.codeium_enabled = false
-            end,
-        })
-        vim.api.nvim_create_autocmd('User', {
-            pattern = 'BlinkCmpMenuClose',
-            callback = function()
-                require('neocodeium.commands').enable()
-                -- vim.g.codeium_enabled = true
+                neocodeium.clear()
             end,
         })
     end,

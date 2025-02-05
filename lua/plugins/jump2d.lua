@@ -2,7 +2,6 @@ return {
     'echasnovski/mini.jump2d',
     event = 'BufReadPost',
     version = '*',
-    dependencies = { 'catppuccin/nvim' },
     opts = function()
         local jump2d = require('mini.jump2d')
         local word = jump2d.gen_union_spotter(

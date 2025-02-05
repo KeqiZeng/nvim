@@ -26,20 +26,22 @@ return {
                         },
                         ["ac"] = { query = "@class.outer", desc = "Select outer part of a class region" },
                         ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
+
+                        ["in"] = { query = "@number.inner", desc = "Select inner part of a number region" },
                     },
                     include_surrounding_whitespace = false,
                 },
                 swap = {
                     enable = true,
                     swap_next = {
-                        ["gSn"] = {
+                        ["ghn"] = {
                             mode = "n",
                             query = "@parameter.inner",
                             desc = "Swap next parameter",
                         },
                     },
                     swap_previous = {
-                        ["gSp"] = {
+                        ["ghp"] = {
                             mode = "n",
                             query = "@parameter.inner",
                             desc = "Swap previous parameter",

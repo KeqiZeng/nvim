@@ -62,6 +62,8 @@ return {
                 { mode = 'x', keys = '<leader>h',  desc = 'Hunks' },
                 { mode = 'n', keys = '<leader>m',  desc = 'MultiCursor' },
                 { mode = 'x', keys = '<leader>m',  desc = 'MultiCursor' },
+                { mode = 'n', keys = '<leader>n',  desc = 'Notification' },
+
                 { mode = 'n', keys = 'gS',         desc = 'Swap parameters' },
 
                 -- submode multicursor <leader>m

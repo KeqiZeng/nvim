@@ -47,8 +47,6 @@ return {
         end,
         integrations = {
             blink_cmp = true,
-            fzf = true,
-            gitsigns = true,
             markdown = true,
             mason = true,
             mini = {

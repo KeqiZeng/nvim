@@ -97,6 +97,7 @@ opt.autoread = true
 -- noselect: do not auto-select first match
 -- preview:  show extra information about the completion
 opt.completeopt = "menu,menuone,noselect,preview"
+opt.complete = "."
 
 -- Indent
 opt.autoindent = true  -- copy indent from current line when starting a new line

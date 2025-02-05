@@ -5,7 +5,7 @@ return {
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         "saghen/blink.cmp",
-        "ibhagwan/fzf-lua",
+        "echasnovski/mini.extra",
     },
     config = function()
         local border = {
@@ -26,7 +26,7 @@ return {
             update_in_insert = false,
             severity_sort = true,
         })
-        local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+        local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
         for type, icon in pairs(signs) do
             local hl = "DiagnosticSign" .. type
             vim.fn.sign_define(hl, { text = icon, texthl = hl })
@@ -82,6 +82,7 @@ return {
                                 vim.g.code_action_available = false
                             else
                                 vim.g.code_action_available = true
+                                vim.api.nvim_exec_autocmds("User", { pattern = "CodeActionAvailable" })
                             end
                         end)
                     end,
@@ -110,21 +111,74 @@ return {
                     opts.desc = desc
                     return opts
                 end
-                local fzf = require("fzf-lua")
-                vim.keymap.set("n", "gd", fzf.lsp_definitions, set_opts("Go to definition"))
-                vim.keymap.set("n", "gD", fzf.lsp_declarations, set_opts("Go to declaration"))
-                vim.keymap.set("n", "gt", fzf.lsp_typedefs, set_opts("Go to type_definition"))
-                vim.keymap.set("n", "gp", fzf.lsp_implementations, set_opts("Go to implementation"))
-                vim.keymap.set("n", "gr", fzf.lsp_references, set_opts("Go to references"))
-                vim.keymap.set("n", "<leader>fs", fzf.lsp_document_symbols, set_opts("Find document symbols"))
-                vim.keymap.set("n", "<leader>fS", fzf.lsp_workspace_symbols, set_opts("Find workspace symbols"))
-                vim.keymap.set("n", "<leader>fd", fzf.lsp_document_diagnostics, set_opts("Find document diagnostics"))
-                vim.keymap.set("n", "<leader>fD", fzf.lsp_workspace_diagnostics, set_opts("Find workspace diagnostics"))
+
+                local pick = require("mini.extra").pickers
+                local common_mappings = {
+                    choose_in_split   = '<C-s>',
+                    choose_in_tabpage = '<C-t>',
+                    choose_in_vsplit  = '<C-v>',
+                    choose_marked     = '<C-CR>',
+                    toggle_preview    = '<Tab>',
+                }
+                vim.keymap.set("n", "gd", function()
+                    pick.lsp({ scope = "definition" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Go to definition"))
+
+                vim.keymap.set("n", "gD", function()
+                    pick.lsp({ scope = "declaration" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Go to declaration"))
+
+                vim.keymap.set("n", "gD", function()
+                    pick.lsp({ scope = "type_definition" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Go to type definition"))
+
+                vim.keymap.set("n", "gD", function()
+                    pick.lsp({ scope = "implementation" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Go to implementation"))
+
+                vim.keymap.set("n", "gr", function()
+                    pick.lsp({ scope = "references" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Go to references"))
+
+                vim.keymap.set("n", "<leader>fs", function()
+                    pick.lsp({ scope = "document_symbol" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Find document symbols"))
+
+                vim.keymap.set("n", "<leader>fS", function()
+                    pick.lsp({ scope = "workspace_symbol" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Find workspace symbols"))
+
+                vim.keymap.set("n", "<leader>fd", function()
+                    pick.diagnostic({ scope = "current" }, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Find document diagnostics"))
+
+                vim.keymap.set("n", "<leader>fD", function()
+                    pick.diagnostic(nil, {
+                        mappings = common_mappings,
+                    })
+                end, set_opts("Find workspace diagnostics"))
+
                 vim.keymap.set("n", "K", vim.lsp.buf.hover, set_opts("Hover"))
                 vim.keymap.set("n", "gk", vim.lsp.buf.signature_help, set_opts("Show signature help"))
                 vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, set_opts("Rename"))
                 vim.keymap.set("n", "<leader>a", function()
-                    fzf.lsp_code_actions()
+                    vim.lsp.buf.code_action()
                     vim.g.code_action_available = false
                 end, set_opts("Code actions"))
             end,
@@ -148,7 +202,6 @@ return {
             "html",
             "jsonls",
             "lua_ls",
-            -- "pyright",
             "basedpyright",
             "rust_analyzer",
             "tinymist",

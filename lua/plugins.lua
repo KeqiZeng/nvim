@@ -16,13 +16,14 @@ require("lazy").setup({
     require("plugins.icons"),
     require("plugins.statusline"),
     require("plugins.tabline"),
+    require("plugins.notify"),
     require("plugins.treesitter"),
     require("plugins.treesitter-context"),
     require("plugins.lsp"),
     require("plugins.cmp"),
     require("plugins.neocodeium"),
     require("plugins.mason"),
-    require("plugins.file-explorer"),
+    require("plugins.files"),
     require("plugins.cursorword"),
     require("plugins.indent"),
     require("plugins.autopairs"),
@@ -30,12 +31,13 @@ require("lazy").setup({
     require("plugins.hipatters"),
     require("plugins.diff"),
     require("plugins.map"),
+    require("plugins.clue"),
     require("plugins.jump"),
     require("plugins.jump2d"),
-    require("plugins.surround"), -- surround maybe have to after jump2d, for `ds` keymap
-    require("plugins.fzf"),
+    require("plugins.surround"),
+    require("plugins.splitjoin"),
+    require("plugins.pick"),
     require("plugins.multicursor"),
-    require("plugins.clue"),
     -- local plugins
     {
         dir = vim.fn.stdpath("config") .. "/lua/plugins/terminal",
@@ -68,6 +70,13 @@ require("lazy").setup({
         event = { "BufReadPost", "BufNewFile" },
         config = function()
             require("plugins.gitblame").setup()
+        end
+    },
+    {
+        dir = vim.fn.stdpath("config") .. "/lua/plugins/cdroot",
+        event = { "BufEnter" },
+        config = function()
+            require("plugins.cdroot").setup()
         end
     },
 })

@@ -30,7 +30,7 @@ return {
             "stylua",
             "markdownlint",
             "prettier",
-            "pyright",
+            "basedpyright",
             "rust-analyzer",
             "ruff",
             "shellcheck",

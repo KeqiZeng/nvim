@@ -44,7 +44,6 @@ return {
             return statusline.is_truncated(args.trunc_width) and "" or diagnostics
         end
 
-        vim.g.code_action_available = false
         local function gen_code_action_indicator()
             if vim.g.code_action_available then
                 return "💡"
@@ -52,7 +51,7 @@ return {
             return ""
         end
 
-        local branch_cached = ""
+        local branch_cached = " "
         local function update_git_branch()
             vim.schedule(function()
                 local current_bufnr = vim.api.nvim_get_current_buf()
@@ -73,7 +72,7 @@ return {
                 if vim.v.shell_error == 0 and branch ~= "" then
                     branch_cached = " 󰘬 " .. branch .. " "
                 else
-                    branch_cached = ""
+                    branch_cached = " "
                 end
             end)
         end
@@ -83,11 +82,12 @@ return {
             pattern = "*",
             callback = function()
                 update_git_branch()
+                vim.api.nvim_exec_autocmds("User", { pattern = "UpdateGitBranch" })
             end
         })
 
         local function gen_branch(args)
-            local branch = branch_cached == "" and "" or "%#MiniStatuslineBranch#" .. branch_cached
+            local branch = "%#MiniStatuslineBranch#" .. branch_cached
             return statusline.is_truncated(args.trunc_width) and "" or branch
         end
 
@@ -104,7 +104,7 @@ return {
             local search                = statusline.section_searchcount({ trunc_width = 75 })
 
             return statusline.combine_groups({
-                { hl = mode_hl,                 strings = { string.upper(mode) } },
+                { hl = mode_hl,                 strings = { mode } },
                 branch,
                 diff,
                 diagnostics,
@@ -125,9 +125,11 @@ return {
         }
     end,
     init    = function()
-        local timer = vim.loop.new_timer()
-        timer:start(0, 200, vim.schedule_wrap(function()
-            vim.cmd("redrawstatus")
-        end))
+        vim.api.nvim_create_autocmd("User", {
+            pattern = { "CodeActionAvailable", "UpdateGitBranch" },
+            callback = function()
+                vim.cmd("redrawstatus")
+            end
+        })
     end
 }

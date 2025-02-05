@@ -92,5 +92,15 @@ return {
         map({ "n", "x" }, "z=", function()
             fzf.spell_suggest()
         end, opts("Find spell suggestions"))
+
+        -- vim.keymap.set("n", "gd", fzf.lsp_definitions, set_opts("Go to definition"))
+        -- vim.keymap.set("n", "gD", fzf.lsp_declarations, set_opts("Go to declaration"))
+        -- vim.keymap.set("n", "gt", fzf.lsp_typedefs, set_opts("Go to type_definition"))
+        -- vim.keymap.set("n", "gp", fzf.lsp_implementations, set_opts("Go to implementation"))
+        -- vim.keymap.set("n", "gr", fzf.lsp_references, set_opts("Go to references"))
+        -- vim.keymap.set("n", "<leader>fs", fzf.lsp_document_symbols, set_opts("Find document symbols"))
+        -- vim.keymap.set("n", "<leader>fS", fzf.lsp_workspace_symbols, set_opts("Find workspace symbols"))
+        -- vim.keymap.set("n", "<leader>fd", fzf.lsp_document_diagnostics, set_opts("Find document diagnostics"))
+        -- vim.keymap.set("n", "<leader>fD", fzf.lsp_workspace_diagnostics, set_opts("Find workspace diagnostics"))
     end
 }

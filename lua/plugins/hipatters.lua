@@ -18,14 +18,6 @@ return {
         }
     end,
     init = function()
-        -- Add keybinding to search for FIXME/HACK/TODO/NOTE
-        vim.keymap.set("n", "<leader>ft", function()
-            require("fzf-lua").live_grep_native({
-                search = "\\b(FIXME|HACK|TODO|NOTE)\\b",
-                no_esc = true,
-            })
-        end, { noremap = true, silent = true, desc = "Find TODOs" })
-
         -- Add keybindings to jump between tags
         vim.keymap.set("n", "]t", function()
             vim.fn.search("\\v<(FIXME|HACK|TODO|NOTE)>")
