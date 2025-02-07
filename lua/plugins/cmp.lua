@@ -24,8 +24,8 @@ return {
                     auto_show = function(ctx) return ctx.mode ~= 'cmdline' end,
                     draw = {
                         columns = {
-                            { "label",     "label_description", gap = 1 },
-                            { "kind_icon", "kind" },
+                            { "kind_icon" },
+                            { "label",    "label_description", "kind", gap = 1 },
                         },
                     }
                 },
@@ -75,7 +75,14 @@ return {
             },
 
             sources = {
-                default = { 'lsp', 'path', 'snippets', 'buffer' },
+                default = function(ctx)
+                    local success, node = pcall(vim.treesitter.get_node)
+                    if success and node and vim.tbl_contains({ 'comment', 'line_comment', 'block_comment' }, node:type()) then
+                        return { 'buffer' }
+                    else
+                        return { 'lsp', 'path', 'snippets', 'buffer' }
+                    end
+                end
             },
         }
     end,

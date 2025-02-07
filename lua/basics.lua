@@ -96,7 +96,7 @@ opt.autoread = true
 -- menuone:  show menu even when there is only one match
 -- noselect: do not auto-select first match
 -- preview:  show extra information about the completion
-opt.completeopt = "menu,menuone,noselect,preview"
+opt.completeopt = "menu,menuone,preview"
 opt.complete = "."
 
 -- Indent

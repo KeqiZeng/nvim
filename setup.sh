@@ -10,8 +10,8 @@ pip install neovim pynvim
 brew tap laishulu/homebrew
 brew install macism
 
-# fzf
-brew install fzf ripgrep fd bat
+# mini pick
+brew install ripgrep fd
 
 # treesitter
 brew install tree-sitter
