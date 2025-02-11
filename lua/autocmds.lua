@@ -135,4 +135,3 @@ if vim.fn.executable("macism") == 1 then
 else
     vim.notify("macism not found. Input method autoswitch disabled.", vim.log.levels.WARN)
 end
-

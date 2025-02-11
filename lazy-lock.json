@@ -1,7 +1,8 @@
 {
   "blink.cmp": { "branch": "main", "commit": "b6f11a0aa33e601c469a126e3ed6e35208fe3ea3" },
   "catppuccin": { "branch": "main", "commit": "4965db2d6155c25db4e8417465fc2703fdf4c2b7" },
-  "lazy.nvim": { "branch": "main", "commit": "7527af40ddd4a93a02911be570b32609b9d4ea53" },
+  "dracula.nvim": { "branch": "main", "commit": "2339333faa5584123056864a3285e30529a1c715" },
+  "lazy.nvim": { "branch": "main", "commit": "f15a93907ddad3d9139aea465ae18336d87f5ce6" },
   "mason-lspconfig.nvim": { "branch": "main", "commit": "f75e877f5266e87523eb5a18fcde2081820d087b" },
   "mason.nvim": { "branch": "main", "commit": "e2f7f9044ec30067bc11800a9e266664b88cda22" },
   "mini.clue": { "branch": "main", "commit": "8e7681e9433766142e8c0977e7f9c31220c78cff" },
@@ -22,11 +23,12 @@
   "mini.statusline": { "branch": "main", "commit": "1b0edf76fe2af015f8c989385ff949f1db7aade2" },
   "mini.surround": { "branch": "main", "commit": "aa5e245829dd12d8ff0c96ef11da28681d6049aa" },
   "mini.tabline": { "branch": "main", "commit": "06ef4ecaeca2e362c7d31113435d86d144b3cbbe" },
-  "multicursor.nvim": { "branch": "1.0", "commit": "9dac1bdce192af0c994c2c14964771416a03388a" },
+  "multicursor.nvim": { "branch": "1.0", "commit": "8b111e6b478d4eb0f51a530d057956479a6ca723" },
   "neocodeium": { "branch": "main", "commit": "a2b5257c736886ec3ccbd961766f8ab9c82b2a72" },
-  "nvim-lspconfig": { "branch": "master", "commit": "66bc018936c6ff76beb75f89d986af6442db4001" },
-  "nvim-treesitter": { "branch": "master", "commit": "9e0b5e7f0d148963d6ec71c48cec1a3f8607d619" },
-  "nvim-treesitter-context": { "branch": "master", "commit": "9a49f43a2ec9bf77aecfb0fcbc43af43338375c0" },
+  "nvim-lspconfig": { "branch": "master", "commit": "6c17f8656f667727b27f5f598463afedb7791b18" },
+  "nvim-treesitter": { "branch": "master", "commit": "6108ba7a135ed37e32276ccb877a348af17fe411" },
+  "nvim-treesitter-context": { "branch": "master", "commit": "03f382ef224c27a8508cdab2d0b463dcb8ca12a6" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "ad8f0a472148c3e0ae9851e26a722ee4e29b1595" },
-  "rainbow-delimiters.nvim": { "branch": "master", "commit": "dc788723f717bdd3041838b8db34cce53c9aa920" }
+  "rainbow-delimiters.nvim": { "branch": "master", "commit": "dc788723f717bdd3041838b8db34cce53c9aa920" },
+  "tokyonight.nvim": { "branch": "main", "commit": "84ea0b5f4651afdf50ececaf6f110fe9d9dc9458" }
 }

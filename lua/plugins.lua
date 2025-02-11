@@ -13,6 +13,8 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     require("plugins.catppuccin"),
+    require("plugins.tokyonight"),
+    require("plugins.dracula"),
     require("plugins.icons"),
     require("plugins.statusline"),
     require("plugins.tabline"),
